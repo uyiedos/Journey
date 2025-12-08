@@ -1,0 +1,343 @@
+/* Gamification Styles and Animations */
+
+/* Shimmer effect for glow cards */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer 2s infinite;
+}
+
+/* Gradient animation for borders */
+@keyframes gradient-xy {
+  0%, 100% {
+    background-size: 400% 400%;
+    background-position: left center;
+  }
+  50% {
+    background-size: 200% 200%;
+    background-position: right center;
+  }
+}
+
+.animate-gradient-xy {
+  background-size: 400% 400%;
+  animation: gradient-xy 15s ease infinite;
+}
+
+/* Bounce animation for achievements */
+@keyframes bounce-gentle {
+  0%, 100% {
+    transform: translateY(-25%);
+    animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+  }
+  50% {
+    transform: translateY(0);
+    animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+  }
+}
+
+.animate-bounce-gentle {
+  animation: bounce-gentle 2s infinite;
+}
+
+/* Pulse animation for active states */
+@keyframes pulse-slow {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Slide in animations */
+@keyframes slideInUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-in-up {
+  animation: slideInUp 0.5s ease-out;
+}
+
+@keyframes slideInDown {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-in-down {
+  animation: slideInDown 0.5s ease-out;
+}
+
+/* Scale animations */
+@keyframes scaleIn {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.3s ease-out;
+}
+
+/* Progress bar animations */
+@keyframes progressFill {
+  from {
+    width: 0%;
+  }
+  to {
+    width: var(--progress-width);
+  }
+}
+
+.progress-animate {
+  animation: progressFill 1s ease-out forwards;
+}
+
+/* Streak fire animation */
+@keyframes flicker {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
+}
+
+.animate-flicker {
+  animation: flicker 1.5s ease-in-out infinite;
+}
+
+/* Achievement unlock animation */
+@keyframes achievementUnlock {
+  0% {
+    transform: scale(0) rotate(180deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2) rotate(90deg);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+.animate-achievement-unlock {
+  animation: achievementUnlock 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* Level up animation */
+@keyframes levelUp {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.7);
+  }
+  70% {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 10px rgba(251, 191, 36, 0);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(251, 191, 36, 0);
+  }
+}
+
+.animate-level-up {
+  animation: levelUp 1s ease-out;
+}
+
+/* Floating animation */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Confetti animation */
+@keyframes confetti-fall {
+  0% {
+    transform: translateY(-100vh) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+.confetti-piece {
+  position: fixed;
+  width: 10px;
+  height: 10px;
+  animation: confetti-fall 3s linear forwards;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* Mobile-optimized touch feedback */
+@media (hover: hover) {
+  .touch-feedback:hover {
+    transform: scale(1.05);
+    transition: transform 0.2s ease;
+  }
+}
+
+@media (hover: none) {
+  .touch-feedback:active {
+    transform: scale(0.95);
+    transition: transform 0.1s ease;
+  }
+}
+
+/* Safe area insets for mobile devices */
+.pb-safe-or-4 {
+  padding-bottom: max(env(safe-area-inset-bottom), 1rem);
+}
+
+.pt-safe-or-4 {
+  padding-top: max(env(safe-area-inset-top), 1rem);
+}
+
+/* Mobile-first responsive utilities */
+@media (max-width: 640px) {
+  .mobile-hidden {
+    display: none;
+  }
+  
+  .mobile-full-width {
+    width: 100%;
+  }
+  
+  .mobile-center {
+    text-align: center;
+  }
+  
+  .mobile-stack {
+    flex-direction: column;
+  }
+}
+
+@media (min-width: 641px) {
+  .mobile-hidden {
+    display: block;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .gamified-card {
+    background: linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%);
+    border-color: #374151;
+  }
+  
+  .achievement-card {
+    background: linear-gradient(135deg, #2d2d2d 0%, #262626 100%);
+    border-color: #374151;
+  }
+  
+  .progress-card {
+    background: linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%);
+    border-color: #374151;
+  }
+  
+  .streak-card {
+    background: linear-gradient(135deg, #2d2d2d 0%, #262626 100%);
+    border-color: #374151;
+  }
+  
+  .leaderboard-card {
+    background: linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%);
+    border-color: #374151;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .animate-shimmer,
+  .animate-gradient-xy,
+  .animate-bounce-gentle,
+  .animate-pulse-slow,
+  .animate-slide-in-up,
+  .animate-slide-in-down,
+  .animate-scale-in,
+  .animate-flicker,
+  .animate-achievement-unlock,
+  .animate-level-up,
+  .animate-float,
+  .confetti-piece {
+    animation: none;
+  }
+  
+  .touch-feedback:hover,
+  .touch-feedback:active {
+    transform: none;
+    transition: none;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .gamified-card {
+    border-width: 2px;
+    border-color: #000;
+  }
+  
+  .badge {
+    border: 1px solid #000;
+  }
+  
+  .progress {
+    border: 1px solid #000;
+  }
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  .gamified-card {
+    break-inside: avoid;
+    border: 1px solid #000;
+  }
+}

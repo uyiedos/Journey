@@ -1,0 +1,308 @@
+import { Achievement } from '@/types';
+
+export const achievements: Achievement[] = [
+  // Daily Login Achievements
+  {
+    id: 'daily-login-1',
+    name: 'First Day',
+    description: 'Log in for the first time',
+    icon: 'sun',
+    points: 5,
+    category: 'daily',
+    unlockedAt: new Date(),
+  },
+  {
+    id: 'daily-login-7',
+    name: 'Week Warrior',
+    description: 'Log in for 7 consecutive days',
+    icon: 'calendar',
+    points: 50,
+    category: 'daily',
+    unlockedAt: new Date(),
+  },
+  {
+    id: 'daily-login-30',
+    name: 'Monthly Master',
+    description: 'Log in for 30 consecutive days',
+    icon: 'calendar',
+    points: 200,
+    category: 'daily',
+    unlockedAt: new Date(),
+  },
+
+  // Reading Achievements
+  {
+    id: 'first-verse',
+    name: 'First Steps',
+    description: 'Read your first Bible verse',
+    icon: 'book-open',
+    points: 10,
+    category: 'reading',
+    unlockedAt: new Date(),
+  },
+  {
+    id: 'chapter-complete',
+    name: 'Chapter Reader',
+    description: 'Complete reading an entire chapter',
+    icon: 'book-open',
+    points: 25,
+    category: 'reading',
+    unlockedAt: new Date(),
+  },
+  {
+    id: 'book-complete',
+    name: 'Book Scholar',
+    description: 'Complete reading an entire book',
+    icon: 'book-open',
+    points: 100,
+    category: 'reading',
+    unlockedAt: new Date(),
+  },
+  {
+    id: 'testament-complete',
+    name: 'Testament Master',
+    description: 'Complete reading an entire testament',
+    icon: 'book-open',
+    points: 500,
+    category: 'reading',
+    unlockedAt: new Date(),
+  },
+  {
+    id: 'bible-complete',
+    name: 'Bible Scholar',
+    description: 'Complete reading the entire Bible',
+    icon: 'trophy',
+    points: 1000,
+    category: 'reading',
+    unlockedAt: new Date(),
+  },
+
+  // Streak Achievements
+  {
+    id: 'streak-3',
+    name: '3 Day Streak',
+    description: 'Maintain a 3-day reading streak',
+    icon: 'flame',
+    points: 30,
+    category: 'streak',
+    unlockedAt: new Date(),
+  },
+  {
+    id: 'streak-7',
+    name: 'Week Warrior',
+    description: 'Maintain a 7-day reading streak',
+    icon: 'flame',
+    points: 75,
+    category: 'streak',
+    unlockedAt: new Date(),
+  },
+  {
+    id: 'streak-30',
+    name: 'Monthly Master',
+    description: 'Maintain a 30-day reading streak',
+    icon: 'flame',
+    points: 300,
+    category: 'streak',
+    unlockedAt: new Date(),
+  },
+  {
+    id: 'streak-100',
+    name: 'Century Saint',
+    description: 'Maintain a 100-day reading streak',
+    icon: 'flame',
+    points: 1000,
+    category: 'streak',
+    unlockedAt: new Date(),
+  },
+
+  // Community Achievements
+  {
+    id: 'first-friend',
+    name: 'Friend Maker',
+    description: 'Add your first friend',
+    icon: 'users',
+    points: 15,
+    category: 'community',
+    unlockedAt: new Date(),
+  },
+  {
+    id: 'social-butterfly',
+    name: 'Social Butterfly',
+    description: 'Add 10 friends',
+    icon: 'users',
+    points: 50,
+    category: 'community',
+    unlockedAt: new Date(),
+  },
+  {
+    id: 'first-post',
+    name: 'Voice Heard',
+    description: 'Make your first community post',
+    icon: 'message-circle',
+    points: 20,
+    category: 'community',
+    unlockedAt: new Date(),
+  },
+  {
+    id: 'community-leader',
+    name: 'Community Leader',
+    description: 'Make 10 community posts',
+    icon: 'message-circle',
+    points: 100,
+    category: 'community',
+    unlockedAt: new Date(),
+  },
+
+  // Devotional Achievements
+  {
+    id: 'first-devotional',
+    name: 'First Devotional',
+    description: 'Create your first devotional',
+    icon: 'heart',
+    points: 20,
+    category: 'special',
+    unlockedAt: new Date(),
+  },
+  {
+    id: 'devotional-writer',
+    name: 'Devotional Writer',
+    description: 'Create 5 devotionals',
+    icon: 'heart',
+    points: 100,
+    category: 'special',
+    unlockedAt: new Date(),
+  },
+  {
+    id: 'devotional-author',
+    name: 'Devotional Author',
+    description: 'Create 20 devotionals',
+    icon: 'heart',
+    points: 300,
+    category: 'special',
+    unlockedAt: new Date(),
+  },
+
+  // Prayer Achievements
+  {
+    id: 'first-prayer',
+    name: 'First Prayer',
+    description: 'Share your first prayer',
+    icon: 'hands',
+    points: 15,
+    category: 'special',
+    unlockedAt: new Date(),
+  },
+  {
+    id: 'prayer-warrior',
+    name: 'Prayer Warrior',
+    description: 'Share 10 prayers',
+    icon: 'hands',
+    points: 75,
+    category: 'special',
+    unlockedAt: new Date(),
+  },
+  {
+    id: 'prayer-intercessor',
+    name: 'Prayer Intercessor',
+    description: 'Share 50 prayers',
+    icon: 'hands',
+    points: 200,
+    category: 'special',
+    unlockedAt: new Date(),
+  },
+
+  // Reading Plan Achievements
+  {
+    id: 'first-plan',
+    name: 'Plan Starter',
+    description: 'Start your first reading plan',
+    icon: 'calendar',
+    points: 10,
+    category: 'reading',
+    unlockedAt: new Date(),
+  },
+  {
+    id: 'plan-completer',
+    name: 'Plan Completer',
+    description: 'Complete your first reading plan',
+    icon: 'calendar',
+    points: 50,
+    category: 'reading',
+    unlockedAt: new Date(),
+  },
+  {
+    id: 'plan-enthusiast',
+    name: 'Plan Enthusiast',
+    description: 'Start 5 reading plans',
+    icon: 'calendar',
+    points: 100,
+    category: 'reading',
+    unlockedAt: new Date(),
+  },
+
+  // Point Achievements
+  {
+    id: 'point-collector',
+    name: 'Point Collector',
+    description: 'Earn 100 points',
+    icon: 'star',
+    points: 50,
+    category: 'special',
+    unlockedAt: new Date(),
+  },
+  {
+    id: 'point-master',
+    name: 'Point Master',
+    description: 'Earn 1000 points',
+    icon: 'star',
+    points: 100,
+    category: 'special',
+    unlockedAt: new Date(),
+  },
+  {
+    id: 'point-legend',
+    name: 'Point Legend',
+    description: 'Earn 10000 points',
+    icon: 'star',
+    points: 500,
+    category: 'special',
+    unlockedAt: new Date(),
+  },
+
+  // Special Achievements
+  {
+    id: 'early-bird',
+    name: 'Early Bird',
+    description: 'Read Bible verses before 6 AM for 7 days',
+    icon: 'sun',
+    points: 150,
+    category: 'special',
+    unlockedAt: new Date(),
+  },
+  {
+    id: 'night-owl',
+    name: 'Night Owl',
+    description: 'Read Bible verses after 10 PM for 7 days',
+    icon: 'moon',
+    points: 150,
+    category: 'special',
+    unlockedAt: new Date(),
+  },
+  {
+    id: 'explorer',
+    name: 'Bible Explorer',
+    description: 'Read from every book of the Bible',
+    icon: 'compass',
+    points: 750,
+    category: 'special',
+    unlockedAt: new Date(),
+  },
+];
+
+export const getAchievementsByCategory = (category: string): Achievement[] => {
+  return achievements.filter(achievement => achievement.category === category);
+};
+
+export const getAchievementById = (id: string): Achievement | undefined => {
+  return achievements.find(achievement => achievement.id === id);
+};
