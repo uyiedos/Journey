@@ -1,0 +1,15 @@
+{
+  "headers": {
+    "x-nextjs-stale-time": "300",
+    "x-nextjs-prerender": "1",
+    "x-next-cache-tags": "_N_T_/layout,_N_T_/virgo-ai/layout,_N_T_/virgo-ai/page,_N_T_/virgo-ai/"
+  },
+  "segmentPaths": [
+    "/_tree",
+    "/_full",
+    "/virgo-ai/__PAGE__",
+    "/virgo-ai",
+    "/_index",
+    "/_head"
+  ]
+}

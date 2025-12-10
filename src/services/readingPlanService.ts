@@ -86,10 +86,8 @@ class ReadingPlanService {
       if (error) {
         console.error('Supabase error details:', {
           message: error.message,
-          code: error.code,
           details: error.details,
           hint: error.hint,
-          request: error.request
         });
         throw error;
       }

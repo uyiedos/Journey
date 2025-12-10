@@ -157,10 +157,13 @@ export class ActivityService {
   // Community Activities
   static async trackPostCreated(userId: string, postId: string): Promise<void> {
     try {
-      // Track activity and check achievements
+      // Track activity and check achievements (no base points from achievements for posts)
       const result = await achievementService.trackActivityAndCheckAchievements(userId, 'post_created', {
         postId,
       });
+
+      // Award fixed points for creating a post (10 points total per post)
+      await supabaseService.addPoints(userId, 10);
       
       // Log activity
       await this.logActivity(userId, 'post_created', {
@@ -175,9 +178,6 @@ export class ActivityService {
 
   static async trackPostLiked(userId: string, postId: string): Promise<void> {
     try {
-      // Add points for engaging with community (2 points)
-      await supabaseService.addPoints(userId, 2);
-      
       // Log activity
       await this.logActivity(userId, 'post_liked', {
         postId,
@@ -190,8 +190,8 @@ export class ActivityService {
 
   static async trackCommentPosted(userId: string, postId: string, commentId: string): Promise<void> {
     try {
-      // Add points for commenting (5 points)
-      await supabaseService.addPoints(userId, 5);
+      // Add points for commenting (2 points)
+      await supabaseService.addPoints(userId, 2);
       
       // Log activity
       await this.logActivity(userId, 'comment_posted', {

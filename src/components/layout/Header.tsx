@@ -5,10 +5,10 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { useAuth } from '@/contexts/SupabaseAuthContext';
+import { useTheme } from '@/contexts/ThemeContext';
 import { useUserData } from '@/contexts/UserDataContext';
+import { useAuth } from '@/contexts/SupabaseAuthContext';
 import { MobileNavigation } from './MobileNavigation';
-import { DailyPointsClaimCompact } from '@/components/features/DailyPointsClaim';
 import { BookOpen, Users, Heart, Trophy, Menu, Search, LogIn, LogOut, Bell, Sparkles, Flame } from 'lucide-react';
 
 export function Header() {
@@ -31,6 +31,12 @@ export function Header() {
             <span className="text-lg sm:text-xl font-bold bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
               Journey
             </span>
+          </Link>
+          <Link href="/events" className="hidden md:block">
+            <Button variant="ghost" size="sm" className="ml-2 flex items-center gap-1">
+              <Sparkles className="h-4 w-4 text-purple-500" />
+              <span>Events</span>
+            </Button>
           </Link>
         </div>
 
@@ -57,9 +63,6 @@ export function Header() {
           {/* User Stats - Enhanced */}
           {authUser ? (
             <div className="flex items-center space-x-1 sm:space-x-2 md:space-x-4">
-              {/* Daily Points Claim - Compact */}
-              <DailyPointsClaimCompact />
-              
               {/* Points Badge - Mobile */}
               <Badge className="hidden md:flex items-center space-x-1 px-2 py-1 sm:px-3 sm:py-1.5 bg-linear-to-r from-yellow-100 to-orange-100 text-yellow-800 border-yellow-200 shadow-sm">
                 <Trophy className="h-3 w-3" />

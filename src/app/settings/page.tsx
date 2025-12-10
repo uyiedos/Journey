@@ -13,9 +13,6 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   Settings, 
-  Moon, 
-  Sun, 
-  Monitor, 
   Bell, 
   Mail, 
   MessageSquare, 
@@ -78,7 +75,6 @@ export default function SettingsPage() {
   }
   
   // Initialize settings from user data
-  const [theme, setTheme] = useState<'light' | 'dark' | 'system'>((user.settings.theme as 'light' | 'dark' | 'system') || 'system');
   const [notifications, setNotifications] = useState(user.settings.notifications || {
     email: true,
     push: true,
@@ -106,19 +102,6 @@ export default function SettingsPage() {
     showNotes: true,
   });
   const [soundEnabled, setSoundEnabled] = useState(true);
-
-  // Apply theme changes
-  useEffect(() => {
-    const root = window.document.documentElement;
-    root.classList.remove('light', 'dark');
-    
-    if (theme === 'system') {
-      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-      root.classList.add(systemTheme);
-    } else {
-      root.classList.add(theme);
-    }
-  }, [theme]);
 
   // Initialize account form
   useEffect(() => {
@@ -239,15 +222,6 @@ export default function SettingsPage() {
     setReading(prev => ({ ...prev, [key]: value }));
   };
 
-  const getThemeIcon = (themeValue: string) => {
-    switch (themeValue) {
-      case 'light': return <Sun className="h-4 w-4" />;
-      case 'dark': return <Moon className="h-4 w-4" />;
-      case 'system': return <Monitor className="h-4 w-4" />;
-      default: return <Monitor className="h-4 w-4" />;
-    }
-  };
-
   return (
     <Layout>
       <div className="max-w-4xl mx-auto space-y-6">
@@ -262,131 +236,13 @@ export default function SettingsPage() {
           </div>
         </div>
 
-        <Tabs defaultValue="general" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5">
-            <TabsTrigger value="general">General</TabsTrigger>
+        <Tabs defaultValue="notifications" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="notifications">Notifications</TabsTrigger>
             <TabsTrigger value="privacy">Privacy</TabsTrigger>
             <TabsTrigger value="reading">Reading</TabsTrigger>
             <TabsTrigger value="account">Account</TabsTrigger>
           </TabsList>
-
-          {/* General Settings */}
-          <TabsContent value="general" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <Monitor className="h-5 w-5" />
-                  <span>Appearance</span>
-                </CardTitle>
-                <CardDescription>
-                  Customize how the app looks and feels
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-1">
-                    <Label>Theme</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Choose your preferred color scheme
-                    </p>
-                  </div>
-                  <Select value={theme} onValueChange={(value: 'light' | 'dark' | 'system') => setTheme(value)}>
-                    <SelectTrigger className="w-40">
-                      <div className="flex items-center space-x-2">
-                        {getThemeIcon(theme)}
-                        <SelectValue />
-                      </div>
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="light">
-                        <div className="flex items-center space-x-2">
-                          <Sun className="h-4 w-4" />
-                          <span>Light</span>
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="dark">
-                        <div className="flex items-center space-x-2">
-                          <Moon className="h-4 w-4" />
-                          <span>Dark</span>
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="system">
-                        <div className="flex items-center space-x-2">
-                          <Monitor className="h-4 w-4" />
-                          <span>System</span>
-                        </div>
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <Separator />
-
-                <div className="flex items-center justify-between">
-                  <div className="space-y-1">
-                    <Label>Sound Effects</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Play sounds for notifications and interactions
-                    </p>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    {soundEnabled ? (
-                      <Volume2 className="h-4 w-4 text-muted-foreground" />
-                    ) : (
-                      <VolumeX className="h-4 w-4 text-muted-foreground" />
-                    )}
-                    <Switch
-                      checked={soundEnabled}
-                      onCheckedChange={setSoundEnabled}
-                    />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Language & Region</CardTitle>
-                <CardDescription>
-                  Set your language and regional preferences
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label>Language</Label>
-                    <Select defaultValue="en">
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="en">English</SelectItem>
-                        <SelectItem value="es">Español</SelectItem>
-                        <SelectItem value="fr">Français</SelectItem>
-                        <SelectItem value="de">Deutsch</SelectItem>
-                        <SelectItem value="pt">Português</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Time Zone</Label>
-                    <Select defaultValue="utc-8">
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="utc-8">Pacific Time (UTC-8)</SelectItem>
-                        <SelectItem value="utc-5">Eastern Time (UTC-5)</SelectItem>
-                        <SelectItem value="utc+0">GMT (UTC+0)</SelectItem>
-                        <SelectItem value="utc+1">Central European (UTC+1)</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
 
           {/* Notifications */}
           <TabsContent value="notifications" className="space-y-6">
@@ -823,7 +679,11 @@ export default function SettingsPage() {
                   <div>
                     <h3 className="font-semibold">{user.username || 'No username'}</h3>
                     <p className="text-sm text-muted-foreground">{authUser?.email}</p>
-                    <p className="text-xs text-muted-foreground">Member since {new Date(user.joinedAt).toLocaleDateString()}</p>
+                    {user && 'created_at' in user && (user as any).created_at && (
+                      <p className="text-xs text-muted-foreground">
+                        Member since {new Date((user as any).created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
+                      </p>
+                    )}
                   </div>
                 </div>
 

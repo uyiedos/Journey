@@ -452,7 +452,6 @@ export function GamifiedUserProfile({
                 <Progress 
                   value={(user.stats.reading_plans_completed / 100) * 100} 
                   className="h-1.5 mt-2 bg-blue-100"
-                  indicatorClassName="bg-blue-500"
                 />
               </div>
               <Button variant="ghost" size="icon">

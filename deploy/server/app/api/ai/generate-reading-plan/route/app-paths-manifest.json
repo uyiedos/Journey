@@ -1,0 +1,3 @@
+{
+  "/api/ai/generate-reading-plan/route": "app/api/ai/generate-reading-plan/route.js"
+}

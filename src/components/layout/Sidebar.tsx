@@ -21,7 +21,8 @@ import {
   Gift,
   Shield,
   UserPlus,
-  Cross
+  Cross,
+  Video
 } from 'lucide-react';
 
 const navigation = [
@@ -31,6 +32,7 @@ const navigation = [
   { name: 'Reading Plans', href: '/plans', icon: Calendar },
   { name: 'Virgo AI', href: '/ai-tools', icon: Cross },
   { name: 'Community', href: '/community', icon: Users },
+  { name: 'Events', href: '/events', icon: Video },
   { name: 'Leaderboard', href: '/leaderboard', icon: Crown },
   { name: 'Achievements', href: '/achievements', icon: Trophy },
   { name: 'Referrals', href: '/referrals', icon: UserPlus },
@@ -50,7 +52,7 @@ export function Sidebar({ className }: SidebarProps) {
   const isAdmin = authUser?.app_metadata?.role === 'admin' || authUser?.app_metadata?.role === 'owner';
 
   return (
-    <div className={cn("pb-12 w-64 h-screen bg-white border-r border-gray-200 lg:border-r-0", className)}>
+    <div className={cn("pb-12 w-64 h-screen bg-background border-r lg:border-r-0", className)}>
       <div className="space-y-4 py-4">
         <div className="px-3 py-2">
           <h2 className="mb-2 px-4 text-lg font-semibold tracking-tight">

@@ -6,8 +6,8 @@ import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { useTheme } from '@/contexts/ThemeContext';
 import { useUserData } from '@/contexts/UserDataContext';
-import { DailyPointsClaimCompact } from '@/components/features/DailyPointsClaim';
 import { cn } from '@/lib/utils';
 import {
   BookOpen,
@@ -29,12 +29,14 @@ import {
   LogOut,
   ChevronRight,
   Crown,
-  Gift
+  Gift,
+  Brain
 } from 'lucide-react';
 
 export function MobileNavigation() {
   const pathname = usePathname();
   const { user } = useUserData();
+  const { resolvedTheme } = useTheme();
   const [isOpen, setIsOpen] = useState(false);
 
   const navigation = [
@@ -42,72 +44,80 @@ export function MobileNavigation() {
       name: 'Home', 
       href: '/', 
       icon: Home,
-      color: 'text-blue-500',
-      bgColor: 'bg-blue-50 hover:bg-blue-100',
+      color: 'text-primary',
+      bgColor: 'bg-primary/10 hover:bg-primary/20',
       description: 'Dashboard & Overview'
+    },
+    { 
+      name: 'Virgo AI', 
+      href: '/virgo-ai', 
+      icon: Brain,
+      color: 'text-indigo-600 dark:text-indigo-400',
+      bgColor: 'bg-indigo-50 dark:bg-indigo-900/20 hover:bg-indigo-100 dark:hover:bg-indigo-900/30',
+      description: 'AI Assistant'
     },
     { 
       name: 'Bible', 
       href: '/bible', 
       icon: BookOpen,
-      color: 'text-green-500',
-      bgColor: 'bg-linear-to-r from-green-50 to-green-100 hover:from-green-100 hover:to-green-200',
+      color: 'text-green-600 dark:text-green-400',
+      bgColor: 'bg-green-50 dark:bg-green-900/20 hover:bg-green-100 dark:hover:bg-green-900/30',
       description: 'Read Scripture'
     },
     { 
       name: 'Devotionals', 
       href: '/devotionals', 
       icon: Heart,
-      color: 'text-pink-500',
-      bgColor: 'bg-pink-50 hover:bg-pink-100',
+      color: 'text-pink-600 dark:text-pink-400',
+      bgColor: 'bg-pink-50 dark:bg-pink-900/20 hover:bg-pink-100 dark:hover:bg-pink-900/30',
       description: 'Daily Reflections'
     },
     { 
       name: 'Reading Plans', 
       href: '/plans', 
       icon: Calendar,
-      color: 'text-purple-500',
-      bgColor: 'bg-purple-50 hover:bg-purple-100',
+      color: 'text-purple-600 dark:text-purple-400',
+      bgColor: 'bg-purple-50 dark:bg-purple-900/20 hover:bg-purple-100 dark:hover:bg-purple-900/30',
       description: 'Structured Learning'
     },
     { 
       name: 'Community', 
       href: '/community', 
       icon: Users,
-      color: 'text-orange-500',
-      bgColor: 'bg-orange-50 hover:bg-orange-100',
+      color: 'text-orange-600 dark:text-orange-400',
+      bgColor: 'bg-orange-50 dark:bg-orange-900/20 hover:bg-orange-100 dark:hover:bg-orange-900/30',
       description: 'Connect & Share'
     },
     { 
       name: 'Leaderboard', 
       href: '/leaderboard', 
       icon: Crown,
-      color: 'text-purple-500',
-      bgColor: 'bg-purple-50 hover:bg-purple-100',
+      color: 'text-purple-600 dark:text-purple-400',
+      bgColor: 'bg-purple-50 dark:bg-purple-900/20 hover:bg-purple-100 dark:hover:bg-purple-900/30',
       description: 'Top Rankings'
     },
     { 
       name: 'Achievements', 
       href: '/achievements', 
       icon: Trophy,
-      color: 'text-yellow-500',
-      bgColor: 'bg-yellow-50 hover:bg-yellow-100',
+      color: 'text-yellow-600 dark:text-yellow-400',
+      bgColor: 'bg-yellow-50 dark:bg-yellow-900/20 hover:bg-yellow-100 dark:hover:bg-yellow-900/30',
       description: 'Your Progress'
     },
     { 
       name: 'Donations', 
       href: '/donations', 
       icon: Gift,
-      color: 'text-pink-500',
-      bgColor: 'bg-pink-50 hover:bg-pink-100',
+      color: 'text-pink-600 dark:text-pink-400',
+      bgColor: 'bg-pink-50 dark:bg-pink-900/20 hover:bg-pink-100 dark:hover:bg-pink-900/30',
       description: 'Support & Tokens'
     },
     { 
       name: 'Settings', 
       href: '/settings', 
       icon: Settings,
-      color: 'text-gray-500',
-      bgColor: 'bg-gray-50 hover:bg-gray-100',
+      color: 'text-muted-foreground',
+      bgColor: 'bg-muted/50 hover:bg-muted',
       description: 'Preferences'
     },
   ];
@@ -129,8 +139,8 @@ export function MobileNavigation() {
         <SheetHeader className="p-6 pb-4 border-b">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-linear-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
-                <BookOpen className="h-6 w-6 text-white" />
+              <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary/80 rounded-xl flex items-center justify-center">
+                <BookOpen className="h-6 w-6 text-primary-foreground" />
               </div>
               <div>
                 <SheetTitle className="text-lg font-bold">Journey</SheetTitle>
@@ -147,10 +157,10 @@ export function MobileNavigation() {
         <div className="p-6 pb-4 border-b">
           <div className="flex items-center space-x-4">
             <div className="relative">
-              <div className="w-12 h-12 bg-linear-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center">
-                <User className="h-6 w-6 text-white" />
+              <div className="w-12 h-12 bg-gradient-to-br from-primary to-primary/80 rounded-full flex items-center justify-center">
+                <User className="h-6 w-6 text-primary-foreground" />
               </div>
-              <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-background" />
+              <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-600 dark:bg-green-400 rounded-full border-2 border-background" />
             </div>
             <div className="flex-1">
               <div className="font-semibold">{user?.username || 'Guest'}</div>
@@ -158,11 +168,11 @@ export function MobileNavigation() {
             </div>
             <div className="text-right">
               <div className="flex items-center space-x-1 text-sm font-medium">
-                <Trophy className="h-4 w-4 text-yellow-500" />
+                <Trophy className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
                 <span>{user?.points?.toLocaleString() || 0}</span>
               </div>
               <div className="flex items-center space-x-1 text-sm text-muted-foreground">
-                <Flame className="h-4 w-4 text-orange-500" />
+                <Flame className="h-4 w-4 text-orange-600 dark:text-orange-400" />
                 <span>{user?.streak || 0} days</span>
               </div>
             </div>
@@ -188,7 +198,7 @@ export function MobileNavigation() {
                       "w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-200",
                       isActive 
                         ? "bg-primary-foreground/20" 
-                        : "bg-white shadow-sm group-hover:shadow-md"
+                        : "bg-background shadow-sm group-hover:shadow-md"
                     )}>
                       <Icon className={cn(
                         "h-6 w-6 transition-all duration-200",
@@ -217,9 +227,6 @@ export function MobileNavigation() {
 
         {/* Quick Actions */}
         <div className="p-4 border-t space-y-3">
-          {/* Daily Points Claim */}
-          <DailyPointsClaimCompact />
-          
           <div className="grid grid-cols-2 gap-3">
             <Button variant="outline" className="h-12 space-x-2">
               <Bell className="h-4 w-4" />

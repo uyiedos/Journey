@@ -1,0 +1,7 @@
+{
+  "/_not-found/page": "app/_not-found/page.js",
+  "/ai-tools/page": "app/ai-tools/page.js",
+  "/auth/page": "app/auth/page.js",
+  "/page": "app/page.js",
+  "/virgo-chat/page": "app/virgo-chat/page.js"
+}

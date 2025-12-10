@@ -36,6 +36,8 @@ export function useUserData() {
         level: 1,
         points: 0,
         streak: 0,
+        longestStreak: 0,
+        last_daily_claim: undefined,
         badges: [],
         achievements: [],
         joinedAt: new Date(),
@@ -136,23 +138,20 @@ export function UserDataProvider({ children }: { children: React.ReactNode }) {
           throw new Error('Failed to load user stats');
         }
 
-        // Get user achievements from Supabase
-        const userAchievements = await supabaseService.getUserAchievements(authUser.id);
-
         // Convert Supabase data to our User type
         const userData: User = {
           id: userProfile.id,
-          username: userProfile.username || userProfile.email?.split('@')[0] || 'user',
           email: userProfile.email,
+          username: userProfile.username || 'Anonymous',
           fullName: userProfile.full_name || '',
           avatar: userProfile.avatar_url || '',
-          joinedAt: new Date(userProfile.created_at),
           points: userProfile.points,
           level: userProfile.level,
           streak: userProfile.streak,
           longestStreak: userProfile.longest_streak || 0,
+          lastDailyClaim: userProfile.last_daily_claim,
           friends: [],
-          achievements: userAchievements.map(ua => ua.achievement).filter(Boolean),
+          achievements: [],
           settings: {
             theme: 'system',
             notifications: {
@@ -162,7 +161,7 @@ export function UserDataProvider({ children }: { children: React.ReactNode }) {
               friendRequests: true,
               messages: true,
               achievementAlerts: true,
-              communityPosts: false,
+              communityPosts: true,
               readingReminders: true,
               weeklyProgress: true,
             },
@@ -175,8 +174,8 @@ export function UserDataProvider({ children }: { children: React.ReactNode }) {
             },
             reading: {
               fontSize: 'medium',
-              translation: 'kjv',
-              dailyReminderTime: '08:00',
+              translation: 'NIV',
+              dailyReminderTime: '09:00',
               autoPlayAudio: false,
               highlightVerses: true,
               showNotes: true,
@@ -187,7 +186,7 @@ export function UserDataProvider({ children }: { children: React.ReactNode }) {
               emailNotifications: true,
               pushNotifications: true,
               filterContent: true,
-              hideBlockedUsers: true,
+              hideBlockedUsers: false,
             },
           },
         };
@@ -258,6 +257,9 @@ export function UserDataProvider({ children }: { children: React.ReactNode }) {
         username: userData.username,
         full_name: userData.fullName,
         avatar_url: userData.avatar,
+        points: userData.points,
+        streak: userData.streak,
+        longest_streak: userData.longestStreak,
       };
 
       const updatedProfile = await supabaseService.updateUserProfile(authUser.id, profileUpdates);

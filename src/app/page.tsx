@@ -5,8 +5,6 @@ import Link from 'next/link';
 import { Layout } from '@/components/layout/Layout';
 import { DevotionalCard } from '@/components/features/DevotionalCard';
 import { ReadingPlanCard } from '@/components/features/ReadingPlanCard';
-import { CommunityPost } from '@/components/features/CommunityPost';
-import { CommunityDevotionals } from '@/components/features/CommunityDevotionals';
 import { GamificationStats } from '@/components/features/GamificationStats';
 import { MobileGamificationStats } from '@/components/features/MobileGamificationStats';
 import { DailyPointsClaim } from '@/components/features/DailyPointsClaim';
@@ -18,7 +16,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { getTodaysDevotional, getAllDevotionals } from '@/data/devotionals';
 import { readingPlans, getReadingPlanById } from '@/data/readingPlans';
-import { BookOpen, Users, Heart, Trophy, Star, ArrowRight, Award, Sparkles } from 'lucide-react';
+import { getUpcomingEvents } from '@/data/events';
+import { BookOpen, Users, Heart, Trophy, Star, ArrowRight, Award, Sparkles, Calendar, Video } from 'lucide-react';
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';
@@ -27,6 +26,7 @@ export default function Home() {
   const { stats } = useUserData();
   const todaysDevotional = getTodaysDevotional();
   const allDevotionals = getAllDevotionals();
+  const upcomingEvents = getUpcomingEvents();
 
   return (
     <Layout>
@@ -44,7 +44,7 @@ export default function Home() {
             </div>
             <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto px-4">
               Your Bible devotional app. Read Scripture, grow in faith, 
-              connect with community, and earn rewards on your spiritual journey.
+              connect with others on your spiritual journey, and earn rewards.
             </p>
           </div>
           
@@ -57,7 +57,7 @@ export default function Home() {
               </Button>
             </Link>
             <Link href="/community">
-              <Button variant="outline" size="lg" className="h-12 px-8 border-2 hover:bg-primary/10 transition-all duration-200">
+              <Button variant="outline" className="h-12 px-8 border-2 border-blue-200 hover:bg-blue-50 dark:border-blue-800 dark:hover:bg-blue-900/20 transition-all duration-200">
                 <Users className="mr-2 h-5 w-5" />
                 Join Community
               </Button>
@@ -93,18 +93,15 @@ export default function Home() {
               </div>
             </div>
             
-            {/* Daily Points Claim - Show above stats */}
-            <div className="max-w-md mx-auto lg:mx-0">
-              <DailyPointsClaim />
-            </div>
-            
             {/* Mobile Stats - Show on mobile */}
             <div className="lg:hidden">
+              <DailyPointsClaim />
               <MobileGamificationStats />
             </div>
             
             {/* Desktop Stats - Show on desktop */}
             <div className="hidden lg:block">
+              <DailyPointsClaim />
               <GamificationStats stats={stats} />
             </div>
           </section>
@@ -124,45 +121,48 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Enhanced User Stats - Responsive */}
-        <section className="space-y-6">
+        {/* Events Section */}
+        <section className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-3xl font-bold">Your Journey</h2>
-              <p className="text-muted-foreground">
-                Track your spiritual progress and achievements
+              <h2 className="text-2xl font-bold flex items-center gap-2">
+                <Video className="h-5 w-5 text-purple-500" />
+                Events
+              </h2>
+              <p className="text-muted-foreground text-sm">
+                Join live and recorded events like Shiloh 2025.
               </p>
             </div>
+            <Link href="/events">
+              <Button variant="outline" size="sm">
+                View All Events
+              </Button>
+            </Link>
           </div>
-          
-          {/* Daily Points Claim - Show above stats */}
-          <div className="max-w-md mx-auto lg:mx-0">
-            <DailyPointsClaim />
-          </div>
-          
-          {/* Mobile Stats - Show on mobile */}
-          <div className="lg:hidden">
-            {stats && <MobileGamificationStats />}
-          </div>
-          
-          {/* Desktop Stats - Show on desktop */}
-          <div className="hidden lg:block">
-            {stats && <GamificationStats stats={stats} />}
-          </div>
-        </section>
 
-        {/* Featured Community Devotional */}
-        <section className="space-y-6">
-          <div className="text-center">
-            <h2 className="text-3xl font-bold">Community Spotlight</h2>
-            <p className="text-muted-foreground">
-              Featured devotional shared by our community members
-            </p>
-          </div>
-          
-          <div className="max-w-2xl mx-auto">
-            <FeaturedDevotional />
-          </div>
+          {upcomingEvents.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center justify-between gap-2">
+                  <span>{upcomingEvents[0].title}</span>
+                  <Badge variant="secondary">Upcoming</Badge>
+                </CardTitle>
+                <CardDescription>{upcomingEvents[0].description}</CardDescription>
+              </CardHeader>
+              <CardContent className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Calendar className="h-4 w-4" />
+                  <span>{new Date(upcomingEvents[0].startsAt).toLocaleString()}</span>
+                </div>
+                <Link href="/events">
+                  <Button size="sm" className="flex items-center gap-1">
+                    Join Event
+                    <ArrowRight className="h-4 w-4" />
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+          )}
         </section>
 
         {/* Reading Plans */}
@@ -181,55 +181,6 @@ export default function Home() {
                 userProgress={Math.min((index + 1) * 3, plan.duration)}
               />
             ))}
-          </div>
-        </section>
-
-        {/* Community Devotionals */}
-        <section className="space-y-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-2xl font-bold">More Community Devotionals</h2>
-              <p className="text-muted-foreground">
-                Discover inspiring devotionals shared by our community
-              </p>
-            </div>
-            <Button variant="outline">
-              View All
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {allDevotionals
-              .filter(d => d.id.startsWith('community-'))
-              .slice(0, 2)
-              .map((devotional) => (
-                <DevotionalCard key={devotional.id} devotional={devotional} />
-              ))}
-          </div>
-        </section>
-
-        {/* Community Activity */}
-        <section className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold">Community Activity</h2>
-            <Button variant="outline">View All</Button>
-          </div>
-          <div className="space-y-4">
-            <CommunityPost 
-              post={{
-                id: 'post-1',
-                authorId: 'user-1',
-                content: 'Just finished reading Proverbs chapter 3. The wisdom about trusting in the Lord with all your heart really resonated with me today. Sometimes we try to figure everything out on our own, but God\'s ways are higher than ours.',
-                likes: 45,
-                comments: [
-                  { id: 'c1', authorId: 'user-2', content: 'This is so true!', likes: 5, createdAt: new Date() }
-                ],
-                shares: 12,
-                createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000)
-              }}
-              authorName="Sarah Johnson"
-            />
           </div>
         </section>
       </div>

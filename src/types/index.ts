@@ -1,14 +1,14 @@
 export interface User {
   id: string;
-  username: string;
   email: string;
+  username: string;
   fullName: string;
   avatar?: string;
-  joinedAt: Date;
   points: number;
   level: number;
   streak: number;
   longestStreak: number;
+  lastDailyClaim?: string;
   friends: string[];
   achievements: Achievement[];
   settings: UserSettings;
@@ -68,6 +68,26 @@ export interface Achievement {
   points: number;
   category: string;
   unlockedAt: Date;
+  requirements?: AchievementRequirements;
+  rewards?: AchievementRewards;
+  rarity?: 'common' | 'rare' | 'epic' | 'legendary';
+  progress?: number;
+  maxProgress?: number;
+}
+
+export interface AchievementRequirements {
+  type: 'count' | 'streak' | 'points' | 'social' | 'group' | 'challenge';
+  target: number;
+  current?: number;
+  conditions?: string[];
+}
+
+export interface AchievementRewards {
+  points: number;
+  badge?: string;
+  title?: string;
+  unlockFeatures?: string[];
+  groupPoints?: number;
 }
 
 export interface Bible {
@@ -181,4 +201,15 @@ export interface LeaderboardEntry {
   username: string;
   points: number;
   rank: number;
+}
+
+export interface Event {
+  id: string;
+  title: string;
+  description: string;
+  type: 'video';
+  videoUrl: string;
+  startsAt: string;
+  createdAt: string;
+  tags?: string[];
 }

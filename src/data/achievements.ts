@@ -10,6 +10,9 @@ export const achievements: Achievement[] = [
     points: 5,
     category: 'daily',
     unlockedAt: new Date(),
+    rarity: 'common',
+    requirements: { type: 'count', target: 1 },
+    rewards: { points: 5, badge: 'newcomer' }
   },
   {
     id: 'daily-login-7',
@@ -19,6 +22,9 @@ export const achievements: Achievement[] = [
     points: 50,
     category: 'daily',
     unlockedAt: new Date(),
+    rarity: 'common',
+    requirements: { type: 'streak', target: 7 },
+    rewards: { points: 50, badge: 'dedicated' }
   },
   {
     id: 'daily-login-30',
@@ -28,6 +34,9 @@ export const achievements: Achievement[] = [
     points: 200,
     category: 'daily',
     unlockedAt: new Date(),
+    rarity: 'rare',
+    requirements: { type: 'streak', target: 30 },
+    rewards: { points: 200, badge: 'consistent' }
   },
 
   // Reading Achievements
@@ -39,6 +48,9 @@ export const achievements: Achievement[] = [
     points: 10,
     category: 'reading',
     unlockedAt: new Date(),
+    rarity: 'common',
+    requirements: { type: 'count', target: 1 },
+    rewards: { points: 10, badge: 'reader' }
   },
   {
     id: 'chapter-complete',
@@ -48,6 +60,9 @@ export const achievements: Achievement[] = [
     points: 25,
     category: 'reading',
     unlockedAt: new Date(),
+    rarity: 'common',
+    requirements: { type: 'count', target: 1 },
+    rewards: { points: 25, badge: 'chapter_master' }
   },
   {
     id: 'book-complete',
@@ -57,6 +72,9 @@ export const achievements: Achievement[] = [
     points: 100,
     category: 'reading',
     unlockedAt: new Date(),
+    rarity: 'rare',
+    requirements: { type: 'count', target: 1 },
+    rewards: { points: 100, badge: 'book_scholar' }
   },
   {
     id: 'testament-complete',
@@ -66,6 +84,9 @@ export const achievements: Achievement[] = [
     points: 500,
     category: 'reading',
     unlockedAt: new Date(),
+    rarity: 'epic',
+    requirements: { type: 'count', target: 1 },
+    rewards: { points: 500, badge: 'testament_master' }
   },
   {
     id: 'bible-complete',
@@ -75,47 +96,12 @@ export const achievements: Achievement[] = [
     points: 1000,
     category: 'reading',
     unlockedAt: new Date(),
+    rarity: 'legendary',
+    requirements: { type: 'count', target: 1 },
+    rewards: { points: 1000, badge: 'bible_scholar', title: 'Bible Master' }
   },
 
-  // Streak Achievements
-  {
-    id: 'streak-3',
-    name: '3 Day Streak',
-    description: 'Maintain a 3-day reading streak',
-    icon: 'flame',
-    points: 30,
-    category: 'streak',
-    unlockedAt: new Date(),
-  },
-  {
-    id: 'streak-7',
-    name: 'Week Warrior',
-    description: 'Maintain a 7-day reading streak',
-    icon: 'flame',
-    points: 75,
-    category: 'streak',
-    unlockedAt: new Date(),
-  },
-  {
-    id: 'streak-30',
-    name: 'Monthly Master',
-    description: 'Maintain a 30-day reading streak',
-    icon: 'flame',
-    points: 300,
-    category: 'streak',
-    unlockedAt: new Date(),
-  },
-  {
-    id: 'streak-100',
-    name: 'Century Saint',
-    description: 'Maintain a 100-day reading streak',
-    icon: 'flame',
-    points: 1000,
-    category: 'streak',
-    unlockedAt: new Date(),
-  },
-
-  // Community Achievements
+  // Enhanced Community Achievements
   {
     id: 'first-friend',
     name: 'Friend Maker',
@@ -124,6 +110,9 @@ export const achievements: Achievement[] = [
     points: 15,
     category: 'community',
     unlockedAt: new Date(),
+    rarity: 'common',
+    requirements: { type: 'social', target: 1 },
+    rewards: { points: 15, badge: 'friendly' }
   },
   {
     id: 'social-butterfly',
@@ -133,6 +122,21 @@ export const achievements: Achievement[] = [
     points: 50,
     category: 'community',
     unlockedAt: new Date(),
+    rarity: 'common',
+    requirements: { type: 'social', target: 10 },
+    rewards: { points: 50, badge: 'social_butterfly' }
+  },
+  {
+    id: 'community-connector',
+    name: 'Community Connector',
+    description: 'Add 25 friends',
+    icon: 'users',
+    points: 150,
+    category: 'community',
+    unlockedAt: new Date(),
+    rarity: 'rare',
+    requirements: { type: 'social', target: 25 },
+    rewards: { points: 150, badge: 'connector' }
   },
   {
     id: 'first-post',
@@ -142,6 +146,9 @@ export const achievements: Achievement[] = [
     points: 20,
     category: 'community',
     unlockedAt: new Date(),
+    rarity: 'common',
+    requirements: { type: 'count', target: 1 },
+    rewards: { points: 20, badge: 'speaker' }
   },
   {
     id: 'community-leader',
@@ -151,104 +158,221 @@ export const achievements: Achievement[] = [
     points: 100,
     category: 'community',
     unlockedAt: new Date(),
-  },
-
-  // Devotional Achievements
-  {
-    id: 'first-devotional',
-    name: 'First Devotional',
-    description: 'Create your first devotional',
-    icon: 'heart',
-    points: 20,
-    category: 'special',
-    unlockedAt: new Date(),
+    rarity: 'rare',
+    requirements: { type: 'count', target: 10 },
+    rewards: { points: 100, badge: 'leader' }
   },
   {
-    id: 'devotional-writer',
-    name: 'Devotional Writer',
-    description: 'Create 5 devotionals',
-    icon: 'heart',
-    points: 100,
-    category: 'special',
-    unlockedAt: new Date(),
-  },
-  {
-    id: 'devotional-author',
-    name: 'Devotional Author',
-    description: 'Create 20 devotionals',
-    icon: 'heart',
+    id: 'content-creator',
+    name: 'Content Creator',
+    description: 'Make 50 community posts',
+    icon: 'message-circle',
     points: 300,
-    category: 'special',
+    category: 'community',
     unlockedAt: new Date(),
+    rarity: 'epic',
+    requirements: { type: 'count', target: 50 },
+    rewards: { points: 300, badge: 'creator' }
+  },
+  {
+    id: 'engagement-master',
+    name: 'Engagement Master',
+    description: 'Get 100 likes on your posts',
+    icon: 'heart',
+    points: 200,
+    category: 'community',
+    unlockedAt: new Date(),
+    rarity: 'rare',
+    requirements: { type: 'count', target: 100 },
+    rewards: { points: 200, badge: 'engaging' }
   },
 
-  // Prayer Achievements
+  // Group Achievements (NEW)
+  {
+    id: 'group-founder',
+    name: 'Group Founder',
+    description: 'Create your first group',
+    icon: 'users',
+    points: 50,
+    category: 'groups',
+    unlockedAt: new Date(),
+    rarity: 'common',
+    requirements: { type: 'group', target: 1 },
+    rewards: { points: 50, badge: 'founder', unlockFeatures: ['group_creation'] }
+  },
+  {
+    id: 'group-builder',
+    name: 'Group Builder',
+    description: 'Create 3 groups',
+    icon: 'users',
+    points: 150,
+    category: 'groups',
+    unlockedAt: new Date(),
+    rarity: 'rare',
+    requirements: { type: 'group', target: 3 },
+    rewards: { points: 150, badge: 'builder' }
+  },
+  {
+    id: 'points-contributor',
+    name: 'Points Contributor',
+    description: 'Contribute 100 points to group pools',
+    icon: 'star',
+    points: 75,
+    category: 'groups',
+    unlockedAt: new Date(),
+    rarity: 'common',
+    requirements: { type: 'points', target: 100 },
+    rewards: { points: 75, badge: 'contributor', groupPoints: 25 }
+  },
+  {
+    id: 'generous-giver',
+    name: 'Generous Giver',
+    description: 'Contribute 500 points to group pools',
+    icon: 'star',
+    points: 250,
+    category: 'groups',
+    unlockedAt: new Date(),
+    rarity: 'rare',
+    requirements: { type: 'points', target: 500 },
+    rewards: { points: 250, badge: 'generous', groupPoints: 100 }
+  },
+  {
+    id: 'challenge-champion',
+    name: 'Challenge Champion',
+    description: 'Complete 10 group challenges',
+    icon: 'trophy',
+    points: 200,
+    category: 'groups',
+    unlockedAt: new Date(),
+    rarity: 'rare',
+    requirements: { type: 'challenge', target: 10 },
+    rewards: { points: 200, badge: 'champion' }
+  },
+  {
+    id: 'group-master',
+    name: 'Group Master',
+    description: 'Reach 1000 points contributed across all groups',
+    icon: 'crown',
+    points: 500,
+    category: 'groups',
+    unlockedAt: new Date(),
+    rarity: 'epic',
+    requirements: { type: 'points', target: 1000 },
+    rewards: { points: 500, badge: 'master', title: 'Group Master' }
+  },
+
+  // Enhanced Prayer Achievements
   {
     id: 'first-prayer',
     name: 'First Prayer',
     description: 'Share your first prayer',
-    icon: 'hands',
+    icon: 'hand',
     points: 15,
-    category: 'special',
+    category: 'prayer',
     unlockedAt: new Date(),
+    rarity: 'common',
+    requirements: { type: 'count', target: 1 },
+    rewards: { points: 15, badge: 'prayerful' }
   },
   {
     id: 'prayer-warrior',
     name: 'Prayer Warrior',
     description: 'Share 10 prayers',
-    icon: 'hands',
+    icon: 'hand',
     points: 75,
-    category: 'special',
+    category: 'prayer',
     unlockedAt: new Date(),
+    rarity: 'common',
+    requirements: { type: 'count', target: 10 },
+    rewards: { points: 75, badge: 'warrior' }
   },
   {
     id: 'prayer-intercessor',
     name: 'Prayer Intercessor',
     description: 'Share 50 prayers',
-    icon: 'hands',
+    icon: 'hand',
     points: 200,
-    category: 'special',
+    category: 'prayer',
     unlockedAt: new Date(),
+    rarity: 'rare',
+    requirements: { type: 'count', target: 50 },
+    rewards: { points: 200, badge: 'intercessor' }
+  },
+  {
+    id: 'prayer-general',
+    name: 'Prayer General',
+    description: 'Share 100 prayers',
+    icon: 'hand',
+    points: 400,
+    category: 'prayer',
+    unlockedAt: new Date(),
+    rarity: 'epic',
+    requirements: { type: 'count', target: 100 },
+    rewards: { points: 400, badge: 'general', title: 'Prayer General' }
   },
 
-  // Reading Plan Achievements
+  // Enhanced Streak Achievements
   {
-    id: 'first-plan',
-    name: 'Plan Starter',
-    description: 'Start your first reading plan',
-    icon: 'calendar',
-    points: 10,
-    category: 'reading',
+    id: 'streak-3',
+    name: '3 Day Streak',
+    description: 'Maintain a 3-day reading streak',
+    icon: 'flame',
+    points: 30,
+    category: 'streak',
     unlockedAt: new Date(),
+    rarity: 'common',
+    requirements: { type: 'streak', target: 3 },
+    rewards: { points: 30, badge: 'consistent' }
   },
   {
-    id: 'plan-completer',
-    name: 'Plan Completer',
-    description: 'Complete your first reading plan',
-    icon: 'calendar',
-    points: 50,
-    category: 'reading',
+    id: 'streak-7',
+    name: 'Week Warrior',
+    description: 'Maintain a 7-day reading streak',
+    icon: 'flame',
+    points: 75,
+    category: 'streak',
     unlockedAt: new Date(),
+    rarity: 'common',
+    requirements: { type: 'streak', target: 7 },
+    rewards: { points: 75, badge: 'dedicated' }
   },
   {
-    id: 'plan-enthusiast',
-    name: 'Plan Enthusiast',
-    description: 'Start 5 reading plans',
-    icon: 'calendar',
-    points: 100,
-    category: 'reading',
+    id: 'streak-30',
+    name: 'Monthly Master',
+    description: 'Maintain a 30-day reading streak',
+    icon: 'flame',
+    points: 300,
+    category: 'streak',
     unlockedAt: new Date(),
+    rarity: 'rare',
+    requirements: { type: 'streak', target: 30 },
+    rewards: { points: 300, badge: 'faithful' }
+  },
+  {
+    id: 'streak-100',
+    name: 'Century Saint',
+    description: 'Maintain a 100-day reading streak',
+    icon: 'flame',
+    points: 1000,
+    category: 'streak',
+    unlockedAt: new Date(),
+    rarity: 'legendary',
+    requirements: { type: 'streak', target: 100 },
+    rewards: { points: 1000, badge: 'saint', title: 'Century Saint' }
   },
 
-  // Point Achievements
+  // Enhanced Point Achievements
   {
     id: 'point-collector',
     name: 'Point Collector',
     description: 'Earn 100 points',
     icon: 'star',
     points: 50,
-    category: 'special',
+    category: 'points',
     unlockedAt: new Date(),
+    rarity: 'common',
+    requirements: { type: 'points', target: 100 },
+    rewards: { points: 50, badge: 'collector' }
   },
   {
     id: 'point-master',
@@ -256,8 +380,11 @@ export const achievements: Achievement[] = [
     description: 'Earn 1000 points',
     icon: 'star',
     points: 100,
-    category: 'special',
+    category: 'points',
     unlockedAt: new Date(),
+    rarity: 'rare',
+    requirements: { type: 'points', target: 1000 },
+    rewards: { points: 100, badge: 'master' }
   },
   {
     id: 'point-legend',
@@ -265,11 +392,14 @@ export const achievements: Achievement[] = [
     description: 'Earn 10000 points',
     icon: 'star',
     points: 500,
-    category: 'special',
+    category: 'points',
     unlockedAt: new Date(),
+    rarity: 'legendary',
+    requirements: { type: 'points', target: 10000 },
+    rewards: { points: 500, badge: 'legend', title: 'Point Legend' }
   },
 
-  // Special Achievements
+  // Special Enhanced Achievements
   {
     id: 'early-bird',
     name: 'Early Bird',

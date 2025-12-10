@@ -26,6 +26,10 @@ interface GamifiedCardProps {
     variant?: 'default' | 'secondary' | 'destructive' | 'outline'
     icon?: React.ReactNode
   }
+  count?: number
+  label?: string
+  icon?: React.ReactNode
+  title?: React.ReactNode
   progress?: {
     value: number
     max: number
@@ -54,15 +58,15 @@ export function GamifiedCard({
   const getVariantStyles = () => {
     switch (variant) {
       case 'achievement':
-        return 'bg-gradient-to-br from-yellow-50 to-amber-50 border-yellow-200 shadow-yellow-100'
+        return 'bg-gradient-to-br from-yellow-50 to-amber-50 border-yellow-200 shadow-yellow-100 dark:from-yellow-950 dark:to-amber-950 dark:border-yellow-800 dark:shadow-yellow-900'
       case 'progress':
-        return 'bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200 shadow-blue-100'
+        return 'bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200 shadow-blue-100 dark:from-blue-950 dark:to-indigo-950 dark:border-blue-800 dark:shadow-blue-900'
       case 'streak':
-        return 'bg-gradient-to-br from-orange-50 to-red-50 border-orange-200 shadow-orange-100'
+        return 'bg-gradient-to-br from-orange-50 to-red-50 border-orange-200 shadow-orange-100 dark:from-orange-950 dark:to-red-950 dark:border-orange-800 dark:shadow-orange-900'
       case 'leaderboard':
-        return 'bg-gradient-to-br from-purple-50 to-pink-50 border-purple-200 shadow-purple-100'
+        return 'bg-gradient-to-br from-purple-50 to-pink-50 border-purple-200 shadow-purple-100 dark:from-purple-950 dark:to-pink-950 dark:border-purple-800 dark:shadow-purple-900'
       default:
-        return 'bg-white border-gray-200 shadow-gray-100'
+        return 'bg-card border shadow-sm'
     }
   }
 

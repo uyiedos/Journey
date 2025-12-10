@@ -5,17 +5,6 @@ import { AuthProvider } from "@/contexts/SupabaseAuthContext";
 import { UserDataProvider } from "@/contexts/UserDataContext";
 import { MobileContainer } from "@/components/layout/ResponsiveLayout";
 import { ThemeProvider } from "@/contexts/ThemeContext";
-import { ThemeSwitcher } from "@/components/theme/ThemeSwitcher";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
   title: "Journey - Bible Devotional App",
@@ -26,6 +15,16 @@ export const metadata: Metadata = {
     apple: "/apple-touch-icon.svg",
   },
 };
+
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin", "latin-ext"],
+});
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin", "latin-ext"],
+});
 
 export const viewport = {
   width: 'device-width',
@@ -50,7 +49,6 @@ export default function RootLayout({
             <UserDataProvider>
               <MobileContainer>
                 {children}
-                <ThemeSwitcher />
               </MobileContainer>
             </UserDataProvider>
           </AuthProvider>

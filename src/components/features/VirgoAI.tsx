@@ -52,7 +52,6 @@ export function VirgoAI({ onPlanCreated }: VirgoAIProps) {
         readings: virgoPlan.readings,
         user_id: user.id,
         is_public: true,
-        is_active: true
       });
 
       setGeneratedPlan(savedPlan);
