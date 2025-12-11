@@ -8,6 +8,7 @@ export const events: Event[] = [
     type: 'video',
     videoUrl: 'https://www.youtube.com/watch?v=MMTLMdCJZMQ&pp=ygUXc2hpbG9oIDIwMjUgbGl2ZSBzdHJlYW0%3D',
     startsAt: new Date('2025-12-10T19:00:00Z').toISOString(),
+    endsAt: new Date('2025-12-10T21:00:00Z').toISOString(),
     createdAt: new Date().toISOString(),
     tags: ['Shiloh', 'Conference', 'Live Stream'],
   },

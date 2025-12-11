@@ -5,6 +5,7 @@ import { Layout } from '@/components/layout/Layout';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
@@ -23,6 +24,7 @@ const EventsPage: React.FC = () => {
     description: '',
     videoUrl: '',
     startsAt: '',
+    endsAt: '',
     tags: '',
   });
   const [likes, setLikes] = useState<Record<string, number>>({});
@@ -32,7 +34,6 @@ const EventsPage: React.FC = () => {
 
   const classifyEvents = useMemo(() => {
     const now = new Date();
-    const TWO_HOURS = 1000 * 60 * 60 * 2;
 
     const ongoing: Event[] = [];
     const upcoming: Event[] = [];
@@ -45,13 +46,22 @@ const EventsPage: React.FC = () => {
 
     sortedEvents.forEach((event) => {
       const start = new Date(event.startsAt);
-      const diff = start.getTime() - now.getTime();
+      const end = event.endsAt ? new Date(event.endsAt) : null;
 
-      if (Math.abs(diff) < TWO_HOURS) {
+      // Event is ongoing if it has started and not yet ended
+      if (start <= now && (!end || end >= now)) {
         ongoing.push(event);
-      } else if (diff > 0) {
+      } 
+      // Event is upcoming if it hasn't started yet
+      else if (start > now) {
         upcoming.push(event);
-      } else {
+      }
+      // Event is past if it has ended
+      else if (end && end < now) {
+        past.push(event);
+      }
+      // Fallback for events without end time that started more than 2 hours ago
+      else if (!end && (now.getTime() - start.getTime()) > (1000 * 60 * 60 * 2)) {
         past.push(event);
       }
     });
@@ -98,6 +108,7 @@ const EventsPage: React.FC = () => {
       type: 'video',
       videoUrl: newEvent.videoUrl.trim(),
       startsAt: new Date(newEvent.startsAt).toISOString(),
+      endsAt: newEvent.endsAt.trim() ? new Date(newEvent.endsAt).toISOString() : undefined,
       createdAt: new Date().toISOString(),
       tags: newEvent.tags
         .split(',')
@@ -106,7 +117,7 @@ const EventsPage: React.FC = () => {
     };
 
     setAllEvents((prev) => [event, ...prev]);
-    setNewEvent({ title: '', description: '', videoUrl: '', startsAt: '', tags: '' });
+    setNewEvent({ title: '', description: '', videoUrl: '', startsAt: '', endsAt: '', tags: '' });
 
     try {
       await supabaseService.addPoints(authUser.id, 500);
@@ -176,6 +187,12 @@ const EventsPage: React.FC = () => {
                 <Calendar className="h-4 w-4" />
                 {formatDateTime(event.startsAt)}
               </span>
+              {event.endsAt && (
+                <span className="inline-flex items-center gap-1">
+                  <Clock className="h-4 w-4" />
+                  {formatDateTime(event.endsAt)}
+                </span>
+              )}
             </div>
           </div>
           {event.tags && event.tags.length > 0 && (
@@ -298,11 +315,24 @@ const EventsPage: React.FC = () => {
                 value={newEvent.videoUrl}
                 onChange={(e) => setNewEvent((prev) => ({ ...prev, videoUrl: e.target.value }))}
               />
-              <Input
-                type="datetime-local"
-                value={newEvent.startsAt}
-                onChange={(e) => setNewEvent((prev) => ({ ...prev, startsAt: e.target.value }))}
-              />
+              <div className="space-y-2">
+                <Label htmlFor="start-time">Start Time</Label>
+                <Input
+                  id="start-time"
+                  type="datetime-local"
+                  value={newEvent.startsAt}
+                  onChange={(e) => setNewEvent((prev) => ({ ...prev, startsAt: e.target.value }))}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="end-time">End Time (Optional)</Label>
+                <Input
+                  id="end-time"
+                  type="datetime-local"
+                  value={newEvent.endsAt}
+                  onChange={(e) => setNewEvent((prev) => ({ ...prev, endsAt: e.target.value }))}
+                />
+              </div>
               <Input
                 placeholder="Tags (comma separated)"
                 value={newEvent.tags}

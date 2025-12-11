@@ -212,6 +212,7 @@ export interface Event {
   type: 'video';
   videoUrl: string;
   startsAt: string;
+  endsAt?: string;
   createdAt: string;
   tags?: string[];
 }
