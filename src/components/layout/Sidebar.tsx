@@ -37,6 +37,7 @@ const navigation = [
   { name: 'Achievements', href: '/achievements', icon: Trophy },
   { name: 'Referrals', href: '/referrals', icon: UserPlus },
   { name: 'Donations', href: '/donations', icon: Gift },
+  { name: 'Settings', href: '/settings', icon: Settings },
 ];
 
 interface SidebarProps {
@@ -52,7 +53,7 @@ export function Sidebar({ className }: SidebarProps) {
   const isAdmin = authUser?.app_metadata?.role === 'admin' || authUser?.app_metadata?.role === 'owner';
 
   return (
-    <div className={cn("pb-12 w-64 h-screen bg-card border-r lg:border-r-0 shadow-lg", className)}>
+    <div className={cn("pb-12 w-64 h-screen bg-white border-r border-gray-200 shadow-lg", className)}>
       <div className="space-y-4 py-4">
         <div className="px-3 py-2">
           <h2 className="mb-2 px-4 text-lg font-semibold tracking-tight">

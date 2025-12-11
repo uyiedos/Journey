@@ -239,7 +239,7 @@ export function FriendsList() {
                 <div key={user.id} className="flex items-center justify-between p-3 border rounded-lg">
                   <div className="flex items-center space-x-3">
                     <Avatar className="h-8 w-8">
-                      <AvatarImage src={user.avatar_url} />
+                      <AvatarImage src={user.avatar} />
                       <AvatarFallback>{user.username?.charAt(0) || 'U'}</AvatarFallback>
                     </Avatar>
                     <div>

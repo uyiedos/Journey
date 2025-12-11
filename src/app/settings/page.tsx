@@ -59,6 +59,35 @@ export default function SettingsPage() {
   });
   const [saving, setSaving] = useState(false);
   
+  // Initialize settings with default values, will be updated in useEffect
+  const [notifications, setNotifications] = useState({
+    email: true,
+    push: true,
+    dailyDevotional: true,
+    friendRequests: true,
+    messages: true,
+    achievementAlerts: true,
+    communityPosts: false,
+    readingReminders: true,
+    weeklyProgress: true,
+  });
+  const [privacy, setPrivacy] = useState({
+    profileVisibility: 'public',
+    showOnlineStatus: true,
+    showReadingProgress: true,
+    allowFriendRequests: true,
+    showAchievements: true,
+  });
+  const [reading, setReading] = useState({
+    fontSize: 'medium',
+    translation: 'kjv',
+    dailyReminderTime: '08:00',
+    autoPlayAudio: false,
+    highlightVerses: true,
+    showNotes: true,
+  });
+  const [soundEnabled, setSoundEnabled] = useState(true);
+  
   // Return loading state if user data is not available
   if (!user) {
     return (
@@ -75,33 +104,13 @@ export default function SettingsPage() {
   }
   
   // Initialize settings from user data
-  const [notifications, setNotifications] = useState(user.settings.notifications || {
-    email: true,
-    push: true,
-    dailyDevotional: true,
-    friendRequests: true,
-    messages: true,
-    achievementAlerts: true,
-    communityPosts: false,
-    readingReminders: true,
-    weeklyProgress: true,
-  });
-  const [privacy, setPrivacy] = useState(user.settings.privacy || {
-    profileVisibility: 'public',
-    showOnlineStatus: true,
-    showReadingProgress: true,
-    allowFriendRequests: true,
-    showAchievements: true,
-  });
-  const [reading, setReading] = useState(user.settings.reading || {
-    fontSize: 'medium',
-    translation: 'kjv',
-    dailyReminderTime: '08:00',
-    autoPlayAudio: false,
-    highlightVerses: true,
-    showNotes: true,
-  });
-  const [soundEnabled, setSoundEnabled] = useState(true);
+  useEffect(() => {
+    if (user?.settings) {
+      setNotifications(user.settings.notifications || notifications);
+      setPrivacy(user.settings.privacy || privacy);
+      setReading(user.settings.reading || reading);
+    }
+  }, [user]);
 
   // Initialize account form
   useEffect(() => {
@@ -149,7 +158,7 @@ export default function SettingsPage() {
       // Upload to Supabase Storage
       const fileExt = file.name.split('.').pop();
       const fileName = `${authUser.id}-${Date.now()}.${fileExt}`;
-      const filePath = `avatars/${fileName}`;
+      const filePath = `${authUser.id}/${fileName}`; // Remove 'avatars/' prefix since bucket is already 'avatars'
 
       const { error: uploadError } = await supabase.storage
         .from('avatars')
@@ -165,13 +174,21 @@ export default function SettingsPage() {
       // Update user profile
       const { error: updateError } = await supabase
         .from('users')
-        .update({ avatar: publicUrl })
+        .update({ avatar_url: publicUrl })
         .eq('id', authUser.id);
 
       if (updateError) throw updateError;
 
       // Update local state
       console.log('Avatar updated:', publicUrl);
+      
+      // Update the user data context to reflect the new avatar immediately
+      updateSettings({ avatar: publicUrl });
+      
+      // Update the auth user metadata as well
+      await supabase.auth.updateUser({
+        data: { avatar: publicUrl }
+      });
     } catch (error) {
       console.error('Error uploading image:', error);
     } finally {
@@ -653,14 +670,17 @@ export default function SettingsPage() {
               <CardContent className="space-y-6">
                 {/* Profile Image */}
                 <div className="flex items-center space-x-4">
-                  <div className="relative">
-                    <Avatar className="h-20 w-20">
+                  <div className="relative group">
+                    <Avatar className="h-20 w-20 border-4 border-gray-100 shadow-lg">
                       <AvatarImage src={user.avatar} alt={user.username} />
-                      <AvatarFallback className="text-lg">
+                      <AvatarFallback className="text-lg bg-linear-to-br from-blue-500 to-purple-600 text-white">
                         {user.username?.charAt(0)?.toUpperCase() || 'U'}
                       </AvatarFallback>
                     </Avatar>
-                    <label htmlFor="avatar-upload" className="absolute bottom-0 right-0 bg-primary text-white rounded-full p-1 cursor-pointer hover:bg-primary/90">
+                    <label 
+                      htmlFor="avatar-upload" 
+                      className="absolute bottom-0 right-0 bg-blue-600 text-white rounded-full p-2 cursor-pointer hover:bg-blue-700 shadow-lg transition-all duration-200 group-hover:scale-110 border-2 border-white"
+                    >
                       {uploadingImage ? (
                         <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                       ) : (
@@ -675,15 +695,15 @@ export default function SettingsPage() {
                       className="hidden"
                       disabled={uploadingImage}
                     />
+                    {/* Hover hint */}
+                    <div className="absolute inset-0 rounded-full bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none flex items-center justify-center">
+                      <span className="text-white text-xs font-medium">Change Photo</span>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="font-semibold">{user.username || 'No username'}</h3>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-lg">{user.username || 'No username'}</h3>
                     <p className="text-sm text-muted-foreground">{authUser?.email}</p>
-                    {user && 'created_at' in user && (user as any).created_at && (
-                      <p className="text-xs text-muted-foreground">
-                        Member since {new Date((user as any).created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
-                      </p>
-                    )}
+                    <p className="text-xs text-blue-600 mt-1 font-medium">Click the camera icon to update your photo</p>
                   </div>
                 </div>
 

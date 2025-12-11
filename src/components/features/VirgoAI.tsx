@@ -274,7 +274,7 @@ export function VirgoAI({ onPlanCreated }: VirgoAIProps) {
           <Button 
             onClick={handleCreatePlan}
             disabled={!topic.trim() || isCreating}
-            className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
+            className="w-full bg-linear-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
           >
             {isCreating ? (
               <>

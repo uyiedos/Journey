@@ -243,8 +243,8 @@ export function MobileGamificationStats() {
             ].map((activity, index) => {
               const Icon = activity.icon;
               return (
-                <div key={index} className="flex items-center space-x-3 p-3 rounded-lg hover:bg-muted/50 transition-colors">
-                  <div className={`w-10 h-10 rounded-full bg-muted flex items-center justify-center`}>
+                <div key={index} className="flex items-center space-x-3 p-3 rounded-lg bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-100 dark:border-slate-800 transition-colors">
+                  <div className={`w-10 h-10 rounded-full bg-muted dark:bg-slate-800 flex items-center justify-center`}>
                     <Icon className={`h-5 w-5 ${activity.color}`} />
                   </div>
                   <div className="flex-1">

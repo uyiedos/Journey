@@ -45,7 +45,7 @@ export function MobileNavigation() {
       href: '/', 
       icon: Home,
       color: 'text-primary',
-      bgColor: 'bg-primary/10 hover:bg-primary/20',
+      bgColor: 'bg-blue-50 hover:bg-blue-100 border border-blue-200',
       description: 'Dashboard & Overview'
     },
     { 
@@ -53,7 +53,7 @@ export function MobileNavigation() {
       href: '/virgo-ai', 
       icon: Brain,
       color: 'text-indigo-600 dark:text-indigo-400',
-      bgColor: 'bg-indigo-50 dark:bg-indigo-900/20 hover:bg-indigo-100 dark:hover:bg-indigo-900/30',
+      bgColor: 'bg-indigo-50 hover:bg-indigo-100 border border-indigo-200',
       description: 'AI Assistant'
     },
     { 
@@ -61,7 +61,7 @@ export function MobileNavigation() {
       href: '/bible', 
       icon: BookOpen,
       color: 'text-green-600 dark:text-green-400',
-      bgColor: 'bg-green-50 dark:bg-green-900/20 hover:bg-green-100 dark:hover:bg-green-900/30',
+      bgColor: 'bg-green-50 hover:bg-green-100 border border-green-200',
       description: 'Read Scripture'
     },
     { 
@@ -69,7 +69,7 @@ export function MobileNavigation() {
       href: '/devotionals', 
       icon: Heart,
       color: 'text-pink-600 dark:text-pink-400',
-      bgColor: 'bg-pink-50 dark:bg-pink-900/20 hover:bg-pink-100 dark:hover:bg-pink-900/30',
+      bgColor: 'bg-pink-50 hover:bg-pink-100 border border-pink-200',
       description: 'Daily Reflections'
     },
     { 
@@ -77,7 +77,7 @@ export function MobileNavigation() {
       href: '/plans', 
       icon: Calendar,
       color: 'text-purple-600 dark:text-purple-400',
-      bgColor: 'bg-purple-50 dark:bg-purple-900/20 hover:bg-purple-100 dark:hover:bg-purple-900/30',
+      bgColor: 'bg-purple-50 hover:bg-purple-100 border border-purple-200',
       description: 'Structured Learning'
     },
     { 
@@ -85,7 +85,7 @@ export function MobileNavigation() {
       href: '/community', 
       icon: Users,
       color: 'text-orange-600 dark:text-orange-400',
-      bgColor: 'bg-orange-50 dark:bg-orange-900/20 hover:bg-orange-100 dark:hover:bg-orange-900/30',
+      bgColor: 'bg-orange-50 hover:bg-orange-100 border border-orange-200',
       description: 'Connect & Share'
     },
     { 
@@ -93,7 +93,7 @@ export function MobileNavigation() {
       href: '/leaderboard', 
       icon: Crown,
       color: 'text-purple-600 dark:text-purple-400',
-      bgColor: 'bg-purple-50 dark:bg-purple-900/20 hover:bg-purple-100 dark:hover:bg-purple-900/30',
+      bgColor: 'bg-purple-50 hover:bg-purple-100 border border-purple-200',
       description: 'Top Rankings'
     },
     { 
@@ -101,7 +101,7 @@ export function MobileNavigation() {
       href: '/achievements', 
       icon: Trophy,
       color: 'text-yellow-600 dark:text-yellow-400',
-      bgColor: 'bg-yellow-50 dark:bg-yellow-900/20 hover:bg-yellow-100 dark:hover:bg-yellow-900/30',
+      bgColor: 'bg-yellow-50 hover:bg-yellow-100 border border-yellow-200',
       description: 'Your Progress'
     },
     { 
@@ -109,7 +109,7 @@ export function MobileNavigation() {
       href: '/donations', 
       icon: Gift,
       color: 'text-pink-600 dark:text-pink-400',
-      bgColor: 'bg-pink-50 dark:bg-pink-900/20 hover:bg-pink-100 dark:hover:bg-pink-900/30',
+      bgColor: 'bg-pink-50 hover:bg-pink-100 border border-pink-200',
       description: 'Support & Tokens'
     },
     { 
@@ -117,7 +117,7 @@ export function MobileNavigation() {
       href: '/settings', 
       icon: Settings,
       color: 'text-muted-foreground',
-      bgColor: 'bg-muted/50 hover:bg-muted',
+      bgColor: 'bg-gray-50 hover:bg-gray-100 border border-gray-200',
       description: 'Preferences'
     },
   ];
@@ -130,16 +130,16 @@ export function MobileNavigation() {
         <Button 
           variant="ghost" 
           size="icon" 
-          className="md:hidden h-12 w-12 rounded-full shadow-lg bg-primary/10 hover:bg-primary/20 transition-all duration-200"
+          className="md:hidden h-12 w-12 rounded-full shadow-lg bg-white hover:bg-gray-100 transition-all duration-200 border border-gray-200"
         >
           <Menu className="h-6 w-6" />
         </Button>
       </SheetTrigger>
-      <SheetContent side="left" className="w-80 p-0 overflow-hidden">
+      <SheetContent side="left" className="w-80 p-0 overflow-hidden bg-white border-r border-gray-200">
         <SheetHeader className="p-6 pb-4 border-b">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary/80 rounded-xl flex items-center justify-center">
+              <div className="w-10 h-10 bg-linear-to-br from-primary to-primary/80 rounded-xl flex items-center justify-center">
                 <BookOpen className="h-6 w-6 text-primary-foreground" />
               </div>
               <div>
@@ -157,7 +157,7 @@ export function MobileNavigation() {
         <div className="p-6 pb-4 border-b">
           <div className="flex items-center space-x-4">
             <div className="relative">
-              <div className="w-12 h-12 bg-gradient-to-br from-primary to-primary/80 rounded-full flex items-center justify-center">
+              <div className="w-12 h-12 bg-linear-to-br from-primary to-primary/80 rounded-full flex items-center justify-center">
                 <User className="h-6 w-6 text-primary-foreground" />
               </div>
               <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-600 dark:bg-green-400 rounded-full border-2 border-background" />
@@ -195,10 +195,10 @@ export function MobileNavigation() {
                       : item.bgColor
                   )}>
                     <div className={cn(
-                      "w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-200",
+                      "w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-200 border border-gray-200",
                       isActive 
                         ? "bg-primary-foreground/20" 
-                        : "bg-background shadow-sm group-hover:shadow-md"
+                        : "bg-white shadow-sm group-hover:shadow-md"
                     )}>
                       <Icon className={cn(
                         "h-6 w-6 transition-all duration-200",

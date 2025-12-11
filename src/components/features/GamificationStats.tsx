@@ -65,7 +65,7 @@ export function GamificationStats({ stats }: GamificationStatsProps) {
   return (
     <div className="space-y-6">
       {/* User Personal Stats */}
-      <Card>
+      <Card className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-sm">
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
             <Users className="h-5 w-5 text-blue-500" />
@@ -133,7 +133,7 @@ export function GamificationStats({ stats }: GamificationStatsProps) {
       </Card>
 
       {/* Level Progress */}
-      <Card>
+      <Card className="bg-linear-to-r from-blue-50 to-indigo-50 dark:from-slate-900 dark:to-slate-900 border border-blue-100 dark:border-slate-700 shadow-sm">
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
             <Trophy className="h-5 w-5 text-yellow-500" />
@@ -154,7 +154,7 @@ export function GamificationStats({ stats }: GamificationStatsProps) {
       </Card>
 
       {/* Streak */}
-      <Card>
+      <Card className="bg-linear-to-r from-orange-50 to-amber-50 dark:from-slate-900 dark:to-slate-900 border border-orange-100 dark:border-slate-700 shadow-sm">
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
             <Flame className="h-5 w-5 text-orange-500" />
@@ -170,7 +170,7 @@ export function GamificationStats({ stats }: GamificationStatsProps) {
       </Card>
 
       {/* Community Stats */}
-      <Card>
+      <Card className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-sm">
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
             <Users className="h-5 w-5 text-green-500" />
@@ -211,7 +211,7 @@ export function GamificationStats({ stats }: GamificationStatsProps) {
       </Card>
 
       {/* Recent Badges */}
-      <Card>
+      <Card className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-sm">
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
             <Award className="h-5 w-5 text-purple-500" />
@@ -234,7 +234,7 @@ export function GamificationStats({ stats }: GamificationStatsProps) {
       </Card>
 
       {/* Leaderboard Preview */}
-      <Card>
+      <Card className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-sm">
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
             <Target className="h-5 w-5 text-blue-500" />

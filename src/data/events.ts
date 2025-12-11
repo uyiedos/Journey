@@ -22,3 +22,7 @@ export const getPastEvents = (): Event[] => {
   const now = new Date();
   return events.filter(event => new Date(event.startsAt) < now);
 };
+
+export const getLatestEvents = (): Event[] => {
+  return [...events].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+};

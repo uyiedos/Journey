@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Layout } from '@/components/layout/Layout';
 import { DevotionalCard } from '@/components/features/DevotionalCard';
@@ -11,12 +11,14 @@ import { DailyPointsClaim } from '@/components/features/DailyPointsClaim';
 import { VerseOfTheDay } from '@/components/features/VerseOfTheDay';
 import { FeaturedDevotional } from '@/components/features/FeaturedDevotional';
 import { useUserData } from '@/contexts/UserDataContext';
+import { useAuth } from '@/contexts/SupabaseAuthContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { getTodaysDevotional, getAllDevotionals } from '@/data/devotionals';
 import { readingPlans, getReadingPlanById } from '@/data/readingPlans';
-import { getUpcomingEvents } from '@/data/events';
+import { getLatestEvents } from '@/data/events';
+import { readingPlanService, type ReadingPlan, type UserReadingPlan } from '@/services/readingPlanService';
 import { BookOpen, Users, Heart, Trophy, Star, ArrowRight, Award, Sparkles, Calendar, Video } from 'lucide-react';
 
 // Force dynamic rendering
@@ -24,9 +26,37 @@ export const dynamic = 'force-dynamic';
 
 export default function Home() {
   const { stats } = useUserData();
+  const { user } = useAuth();
+  const [dbReadingPlans, setDbReadingPlans] = useState<ReadingPlan[]>([]);
+  const [userReadingPlans, setUserReadingPlans] = useState<UserReadingPlan[]>([]);
+  const [loading, setLoading] = useState(true);
+  
   const todaysDevotional = getTodaysDevotional();
   const allDevotionals = getAllDevotionals();
-  const upcomingEvents = getUpcomingEvents();
+  const latestEvents = getLatestEvents();
+
+  useEffect(() => {
+    const fetchReadingPlans = async () => {
+      try {
+        setLoading(true);
+        const plans = await readingPlanService.getPublicReadingPlans();
+        setDbReadingPlans(plans);
+        
+        if (user) {
+          const userPlans = await readingPlanService.getUserReadingPlans(user.id);
+          setUserReadingPlans(userPlans);
+        }
+      } catch (error) {
+        console.error('Error fetching reading plans:', error);
+        // Fallback to mock data if database fails
+        setDbReadingPlans(readingPlans.slice(0, 4) as any);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchReadingPlans();
+  }, [user]);
 
   return (
     <Layout>
@@ -62,6 +92,12 @@ export default function Home() {
                 Join Community
               </Button>
             </Link>
+            <Link href="/settings">
+              <Button variant="outline" className="h-12 px-8 border-2 border-green-200 hover:bg-green-50 dark:border-green-800 dark:hover:bg-green-900/20 transition-all duration-200">
+                <Trophy className="mr-2 h-5 w-5" />
+                Claim Daily 10 Points
+              </Button>
+            </Link>
           </div>
           
           {/* Quick Stats Pills - Mobile Optimized */}
@@ -84,110 +120,184 @@ export default function Home() {
         {/* Enhanced User Stats - Only show for authenticated users */}
         {stats && (
           <section className="space-y-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-3xl font-bold">Your Journey</h2>
-                <p className="text-muted-foreground">
-                  Track your spiritual progress and achievements
-                </p>
-              </div>
+            <div className="text-center">
+              <h2 className="text-3xl font-bold">Your Journey</h2>
+              <p className="text-muted-foreground">
+                Track your spiritual progress and achievements
+              </p>
             </div>
             
-            {/* Mobile Stats - Show on mobile */}
-            <div className="lg:hidden">
-              <DailyPointsClaim />
-              <MobileGamificationStats />
-            </div>
-            
-            {/* Desktop Stats - Show on desktop */}
-            <div className="hidden lg:block">
-              <DailyPointsClaim />
-              <GamificationStats stats={stats} />
+            {/* Journey Stats Grid */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <Card className="text-center">
+                <CardContent className="pt-6">
+                  <div className="text-2xl font-bold text-blue-600">{stats?.level || 1}</div>
+                  <div className="text-sm text-muted-foreground">Level</div>
+                </CardContent>
+              </Card>
+              <Card className="text-center">
+                <CardContent className="pt-6">
+                  <div className="text-2xl font-bold text-green-600">{stats?.streak || 0}</div>
+                  <div className="text-sm text-muted-foreground">Reading Streak</div>
+                </CardContent>
+              </Card>
+              <Card className="text-center">
+                <CardContent className="pt-6">
+                  <div className="text-2xl font-bold text-purple-600">{stats?.community_count || 0}</div>
+                  <div className="text-sm text-muted-foreground">Community</div>
+                </CardContent>
+              </Card>
+              <Card className="text-center">
+                <CardContent className="pt-6">
+                  <div className="text-2xl font-bold text-orange-600">{stats?.recent_achievements || 0}</div>
+                  <div className="text-sm text-muted-foreground">Recent Achievements</div>
+                </CardContent>
+              </Card>
             </div>
           </section>
         )}
 
-        {/* Verse of the Day */}
-        <section className="space-y-6">
-          <div className="text-center">
-            <h2 className="text-3xl font-bold">Daily Inspiration</h2>
-            <p className="text-muted-foreground">
-              A selected verse to guide and inspire your day
-            </p>
+        {/* Latest Devotionals */}
+        <section className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-2xl font-bold">Latest Devotionals</h2>
+            <Link href="/devotionals">
+              <Button variant="outline">View All</Button>
+            </Link>
           </div>
           
-          <div className="max-w-2xl mx-auto">
-            <VerseOfTheDay />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {getAllDevotionals().slice(0, 3).map((devotional, index) => (
+              <Card key={`devotional-${devotional.id}-${index}`} className="hover:shadow-lg transition-shadow">
+                <CardHeader>
+                  <CardTitle className="text-lg">{devotional.title}</CardTitle>
+                  <CardDescription>{devotional.date.toLocaleDateString()}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground line-clamp-3">
+                    {devotional.content.substring(0, 150)}...
+                  </p>
+                  <Link href={`/devotionals/${devotional.id}`}>
+                    <Button variant="ghost" size="sm" className="mt-2">
+                      Read More
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                  </Link>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </section>
 
-        {/* Events Section */}
+        {/* Latest Events */}
         <section className="space-y-4">
           <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-2xl font-bold flex items-center gap-2">
-                <Video className="h-5 w-5 text-purple-500" />
-                Events
-              </h2>
-              <p className="text-muted-foreground text-sm">
-                Join live and recorded events like Shiloh 2025.
-              </p>
-            </div>
+            <h2 className="text-2xl font-bold">Latest Events</h2>
             <Link href="/events">
-              <Button variant="outline" size="sm">
-                View All Events
-              </Button>
+              <Button variant="outline">View All Events</Button>
             </Link>
           </div>
-
-          {upcomingEvents.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between gap-2">
-                  <span>{upcomingEvents[0].title}</span>
-                  <Badge variant="secondary">Upcoming</Badge>
-                </CardTitle>
-                <CardDescription>{upcomingEvents[0].description}</CardDescription>
-              </CardHeader>
-              <CardContent className="flex items-center justify-between">
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Calendar className="h-4 w-4" />
-                  <span>{new Date(upcomingEvents[0].startsAt).toLocaleString()}</span>
-                </div>
-                <Link href="/events">
-                  <Button size="sm" className="flex items-center gap-1">
-                    Join Event
-                    <ArrowRight className="h-4 w-4" />
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
+          
+          {latestEvents.length > 0 && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {latestEvents.slice(0, 3).map((event) => (
+                <Card key={event.id} className="hover:shadow-lg transition-shadow">
+                  <CardHeader>
+                    <CardTitle className="flex items-center justify-between gap-2">
+                      <span>{event.title}</span>
+                      <Badge variant="secondary">Latest</Badge>
+                    </CardTitle>
+                    <CardDescription>{event.description}</CardDescription>
+                  </CardHeader>
+                  <CardContent className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Calendar className="h-4 w-4" />
+                      <span>{new Date(event.startsAt).toLocaleDateString()}</span>
+                    </div>
+                    <Link href={`/events/${event.id}`}>
+                      <Button size="sm" className="flex items-center gap-1">
+                        Join Event
+                        <ArrowRight className="h-4 w-4" />
+                      </Button>
+                    </Link>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
           )}
         </section>
 
-        {/* Reading Plans */}
+        {/* Latest Reading Plans */}
         <section className="space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold">Reading Plans</h2>
+            <h2 className="text-2xl font-bold">Latest Reading Plans</h2>
             <Link href="/plans">
               <Button variant="outline">Browse All Plans</Button>
             </Link>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {readingPlans.slice(0, 4).map((plan, index) => (
-              <ReadingPlanCard 
-                key={plan.id} 
-                plan={plan} 
-                userProgress={Math.min((index + 1) * 3, plan.duration)}
-              />
-            ))}
-          </div>
+          
+          {loading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {[...Array(4)].map((_, index) => (
+                <Card key={index} className="animate-pulse">
+                  <CardHeader>
+                    <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                    <div className="h-3 bg-gray-200 rounded w-full"></div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="h-20 bg-gray-200 rounded mb-4"></div>
+                    <div className="h-8 bg-gray-200 rounded"></div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {dbReadingPlans.slice(0, 4).map((plan) => {
+                const userPlan = userReadingPlans.find(up => up.plan_id === plan.id);
+                const progress = userPlan ? userPlan.current_day - 1 : 0;
+                
+                return (
+                  <ReadingPlanCard 
+                    key={plan.id} 
+                    plan={plan} 
+                    userProgress={progress}
+                  />
+                );
+              })}
+            </div>
+          )}
         </section>
       </div>
       
       {/* Footer */}
-      <footer className="mt-16 py-6 border-t border-gray-200 dark:border-gray-800 text-center">
-        <p className="text-muted-foreground">Inspired by faith</p>
+      <footer className="mt-16 py-8 border-t border-gray-200 dark:border-gray-800">
+        <div className="text-center space-y-4">
+          <p className="text-lg font-medium">Inspired by Faith</p>
+          <div className="flex items-center justify-center space-x-4 text-sm text-muted-foreground">
+            <span>Developed by </span>
+            <a 
+              href="https://x.com/blackralphsol" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:text-blue-800 font-medium flex items-center gap-1"
+            >
+              Blackralph.sol
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+              </svg>
+            </a>
+            <span> Made for </span>
+            <a 
+              href="https://solanamobile.com" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-purple-600 hover:text-purple-800 font-medium"
+            >
+              Seeker
+            </a>
+          </div>
+        </div>
       </footer>
     </Layout>
   );

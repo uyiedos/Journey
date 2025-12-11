@@ -17,7 +17,7 @@ import { Video, Calendar, Clock, Heart, MessageCircle } from 'lucide-react';
 const EventsPage: React.FC = () => {
   const { user: authUser } = useAuth();
   const [allEvents, setAllEvents] = useState<Event[]>(initialEvents);
-  const [activeTab, setActiveTab] = useState<'ongoing' | 'upcoming' | 'past'>('ongoing');
+  const [activeTab, setActiveTab] = useState<'all' | 'ongoing' | 'upcoming' | 'past'>('all');
   const [newEvent, setNewEvent] = useState({
     title: '',
     description: '',
@@ -38,7 +38,12 @@ const EventsPage: React.FC = () => {
     const upcoming: Event[] = [];
     const past: Event[] = [];
 
-    allEvents.forEach((event) => {
+    // Sort all events by createdAt (newest first) before categorizing
+    const sortedEvents = [...allEvents].sort((a, b) => 
+      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+
+    sortedEvents.forEach((event) => {
       const start = new Date(event.startsAt);
       const diff = start.getTime() - now.getTime();
 
@@ -307,18 +312,27 @@ const EventsPage: React.FC = () => {
                 onClick={handleCreateEvent}
                 disabled={!newEvent.title.trim() || !newEvent.videoUrl.trim() || !newEvent.startsAt.trim()}
               >
-                Create Event (10 pts)
+                Create Event (500 pts)
               </Button>
             </CardContent>
           </Card>
         )}
 
         <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="w-full">
-          <TabsList className="grid grid-cols-3 w-full">
+          <TabsList className="grid grid-cols-4 w-full">
+            <TabsTrigger value="all">All Events</TabsTrigger>
             <TabsTrigger value="ongoing">Ongoing</TabsTrigger>
             <TabsTrigger value="upcoming">Upcoming</TabsTrigger>
             <TabsTrigger value="past">Past</TabsTrigger>
           </TabsList>
+
+          <TabsContent value="all" className="mt-4 space-y-4">
+            {allEvents.length === 0 ? (
+              <p className="text-center text-muted-foreground">No events yet.</p>
+            ) : (
+              allEvents.map(renderEventCard)
+            )}
+          </TabsContent>
 
           <TabsContent value="ongoing" className="mt-4 space-y-4">
             {ongoing.length === 0 ? (

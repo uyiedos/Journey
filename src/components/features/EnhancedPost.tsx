@@ -121,7 +121,7 @@ export function EnhancedPost({
         <div className="flex items-start justify-between">
           <div className="flex items-center space-x-3">
             <Avatar className="h-10 w-10">
-              <AvatarImage src={(post.author as any)?.avatar_url} />
+              <AvatarImage src={(post.author as any)?.avatar} />
               <AvatarFallback>{(post.author as any)?.full_name?.charAt(0) || (post.author as any)?.username?.charAt(0) || 'U'}</AvatarFallback>
             </Avatar>
             <div className="space-y-1">
@@ -260,7 +260,7 @@ export function EnhancedPost({
             <AuthGuard action="comment">
               <div className="flex space-x-2">
                 <Avatar className="h-8 w-8">
-                  <AvatarImage src={authUser?.user_metadata?.avatar_url} />
+                  <AvatarImage src={authUser?.user_metadata?.avatar} />
                   <AvatarFallback>{authUser?.email?.charAt(0) || 'U'}</AvatarFallback>
                 </Avatar>
                 <div className="flex-1 flex space-x-2">
@@ -296,7 +296,7 @@ export function EnhancedPost({
                 {comments.map((comment) => (
                   <div key={comment.id} className="flex space-x-3">
                     <Avatar className="h-8 w-8">
-                      <AvatarImage src={(comment.author as any)?.avatar_url} />
+                      <AvatarImage src={(comment.author as any)?.avatar} />
                       <AvatarFallback>{(comment.author as any)?.full_name?.charAt(0) || (comment.author as any)?.username?.charAt(0) || 'U'}</AvatarFallback>
                     </Avatar>
                     <div className="flex-1 space-y-2">

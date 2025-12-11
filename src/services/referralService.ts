@@ -62,7 +62,7 @@ export class ReferralService {
 
       const { data: referrals, error: referralError } = await supabase
         .from('referrals')
-        .select('status, points_awarded')
+        .select('status')
         .eq('referrer_id', userId);
 
       console.log('Referrals data:', referrals);

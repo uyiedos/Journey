@@ -47,29 +47,41 @@ export function DailyPointsClaim() {
   if (!user) return null;
 
   return (
-    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-lg p-4 border border-blue-100 dark:border-blue-800/50">
-      <div className="flex items-center justify-between">
+    <div className="rounded-xl p-4 border border-blue-100 bg-white shadow-sm dark:bg-slate-900 dark:border-slate-700">
+      <div className="flex items-center justify-between gap-4">
         <div>
-          <h3 className="font-medium text-sm text-blue-800 dark:text-blue-200">Daily Reward</h3>
-          <p className="text-xs text-blue-600 dark:text-blue-300">
-            {isClaimed ? 'Come back tomorrow!' : 'Claim your daily points!'}
+          <h3 className="font-semibold text-sm text-blue-900 dark:text-blue-100 flex items-center gap-2">
+            <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-200">
+              <Sparkles className="h-3 w-3" />
+            </span>
+            Daily Reward
+          </h3>
+          <p className="text-xs text-blue-700 dark:text-blue-300 mt-1">
+            {isClaimed ? 'Come back tomorrow!' : 'Claim your daily points and keep your journey going.'}
           </p>
         </div>
         <Button
           onClick={handleClaim}
           disabled={isClaimed || isLoading}
           size="sm"
-          className={`${isClaimed ? 'bg-green-100 text-green-800 hover:bg-green-100' : 'bg-blue-100 text-blue-800 hover:bg-blue-200'} dark:bg-blue-900/50 dark:text-blue-100 dark:hover:bg-blue-800/50`}
+          className={
+            isClaimed
+              ? 'rounded-full bg-emerald-100 text-emerald-800 hover:bg-emerald-100 dark:bg-emerald-900 dark:text-emerald-100 dark:hover:bg-emerald-900'
+              : 'rounded-full bg-linear-to-r from-blue-500 to-indigo-600 text-white hover:from-blue-600 hover:to-indigo-700 shadow-md hover:shadow-lg'
+          }
         >
           {isLoading ? (
             'Claiming...'
           ) : isClaimed ? (
             <>
               <Sparkles className="h-4 w-4 mr-1" />
-              Claimed!
+              Claimed
             </>
           ) : (
-            'Claim 10 Points'
+            <>
+              <span className="mr-1 text-xs font-medium uppercase tracking-wide">+10</span>
+              <span>Claim Points</span>
+            </>
           )}
         </Button>
       </div>

@@ -184,7 +184,7 @@ export function SocialInteraction({
           {authUser && (
             <div className="flex space-x-3">
               <Avatar className="h-8 w-8">
-                <AvatarImage src={authUser.user_metadata?.avatar_url} />
+                <AvatarImage src={authUser.user_metadata?.avatar} />
                 <AvatarFallback>{authUser.email?.charAt(0)}</AvatarFallback>
               </Avatar>
               <div className="flex-1 space-y-2">
@@ -218,7 +218,7 @@ export function SocialInteraction({
               commentsList.map((comment) => (
                 <div key={comment.id} className="flex space-x-3">
                   <Avatar className="h-8 w-8">
-                    <AvatarImage src={comment.user?.avatar_url} />
+                    <AvatarImage src={comment.user?.avatar} />
                     <AvatarFallback>
                       {comment.user?.full_name?.charAt(0) || comment.user?.username?.charAt(0) || 'U'}
                     </AvatarFallback>

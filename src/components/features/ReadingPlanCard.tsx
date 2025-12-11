@@ -1,22 +1,44 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { Calendar, Users, Star, Clock, BookOpen } from 'lucide-react';
-import { ReadingPlan } from '@/types';
+import { Calendar, Users, Star, Clock, BookOpen, Play, CheckCircle } from 'lucide-react';
+import { readingPlanService } from '@/services/readingPlanService';
+import { useAuth } from '@/contexts/SupabaseAuthContext';
 import { cn } from '@/lib/utils';
 
 interface ReadingPlanCardProps {
-  plan: ReadingPlan;
+  plan: any; // Using any to avoid type conflicts between service and types
   userProgress?: number;
 }
 
 export function ReadingPlanCard({ plan, userProgress = 0 }: ReadingPlanCardProps) {
+  const { user } = useAuth();
+  const [isStarting, setIsStarting] = useState(false);
+  const [hasStarted, setHasStarted] = useState(userProgress > 0);
   const progressPercentage = (userProgress / plan.duration) * 100;
+  
+  const handleStartPlan = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (!user || isStarting || hasStarted) return;
+    
+    try {
+      setIsStarting(true);
+      await readingPlanService.startReadingPlan(user.id, plan.id);
+      setHasStarted(true);
+      // Optionally redirect to the plan page
+      window.location.href = `/plans/${plan.id}`;
+    } catch (error) {
+      console.error('Error starting reading plan:', error);
+      // You could show a toast notification here
+    } finally {
+      setIsStarting(false);
+    }
+  };
   
   const difficultyColors = {
     beginner: 'bg-green-100 text-green-800',
@@ -86,10 +108,51 @@ export function ReadingPlanCard({ plan, userProgress = 0 }: ReadingPlanCardProps
           <span>{readingsCount} readings</span>
         </div>
         
-        <Button className="w-full" asChild>
-          <Link href={`/plans/${plan.id}`}>
-            {userProgress > 0 ? 'Continue Plan' : 'Start Plan'}
-          </Link>
+        {/* Status Badge */}
+        <div className="flex items-center justify-between">
+          <Badge 
+            variant={hasStarted ? "default" : "secondary"}
+            className={cn(
+              "text-xs",
+              hasStarted ? "bg-green-100 text-green-800 border-green-300" : "bg-gray-100 text-gray-800 border-gray-300"
+            )}
+          >
+            {hasStarted ? (
+              <>
+                <CheckCircle className="mr-1 h-3 w-3" />
+                Started
+              </>
+            ) : (
+              <>
+                <Clock className="mr-1 h-3 w-3" />
+                Not started
+              </>
+            )}
+          </Badge>
+        </div>
+        
+        <Button 
+          className="w-full" 
+          asChild={!hasStarted}
+          onClick={hasStarted ? undefined : handleStartPlan}
+          disabled={isStarting || !user}
+        >
+          {hasStarted ? (
+            <Link href={`/plans/${plan.id}`}>
+              Continue Plan
+            </Link>
+          ) : (
+            <div>
+              {isStarting ? (
+                <span>Starting...</span>
+              ) : (
+                <span>
+                  <Play className="mr-2 h-4 w-4" />
+                  Start Plan
+                </span>
+              )}
+            </div>
+          )}
         </Button>
       </CardContent>
     </Card>
