@@ -92,12 +92,7 @@ export default function Home() {
                 Join Community
               </Button>
             </Link>
-            <Link href="/settings">
-              <Button variant="outline" className="h-12 px-8 border-2 border-green-200 hover:bg-green-50 dark:border-green-800 dark:hover:bg-green-900/20 transition-all duration-200">
-                <Trophy className="mr-2 h-5 w-5" />
-                Claim Daily 10 Points
-              </Button>
-            </Link>
+            <DailyPointsClaim />
           </div>
           
           {/* Quick Stats Pills - Mobile Optimized */}
