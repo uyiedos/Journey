@@ -143,14 +143,14 @@ export default function Home() {
               </Card>
               <Card className="text-center">
                 <CardContent className="pt-6">
-                  <div className="text-2xl font-bold text-purple-600">{stats?.community_count || 0}</div>
-                  <div className="text-sm text-muted-foreground">Community</div>
+                  <div className="text-2xl font-bold text-purple-600">{stats?.badges?.length || 0}</div>
+                  <div className="text-sm text-muted-foreground">Achievements</div>
                 </CardContent>
               </Card>
               <Card className="text-center">
                 <CardContent className="pt-6">
-                  <div className="text-2xl font-bold text-orange-600">{stats?.recent_achievements || 0}</div>
-                  <div className="text-sm text-muted-foreground">Recent Achievements</div>
+                  <div className="text-2xl font-bold text-orange-600">{stats?.points || 0}</div>
+                  <div className="text-sm text-muted-foreground">Total Points</div>
                 </CardContent>
               </Card>
             </div>

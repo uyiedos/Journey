@@ -197,7 +197,7 @@ export function EnhancedChatInterface() {
                 >
                   <div className="flex items-center space-x-3">
                     <Avatar className="h-10 w-10">
-                      <AvatarImage src={conversation.avatar} />
+                      <AvatarImage src={conversation.avatar_url} />
                       <AvatarFallback>
                         {conversation.name?.charAt(0) || 
                          (conversation.type === 'direct' ? 'D' : 'G')}
@@ -243,7 +243,7 @@ export function EnhancedChatInterface() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
                   <Avatar className="h-8 w-8">
-                    <AvatarImage src={selectedConversation.avatar} />
+                    <AvatarImage src={selectedConversation.avatar_url} />
                     <AvatarFallback>
                       {selectedConversation.name?.charAt(0) || 
                        (selectedConversation.type === 'direct' ? 'D' : 'G')}

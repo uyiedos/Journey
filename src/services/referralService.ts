@@ -84,7 +84,7 @@ export class ReferralService {
       const referralList = referrals || [];
       const completed_referrals = referralList.filter(r => r.status === 'completed').length;
       const pending_referrals = referralList.filter(r => r.status === 'pending').length;
-      const points_earned = referralList.reduce((sum, r) => sum + (r.points_awarded || 0), 0);
+      const points_earned = referralList.reduce((sum, r) => sum + ((r as any).points_awarded || 0), 0);
 
       return {
         referral_code: referralCode,

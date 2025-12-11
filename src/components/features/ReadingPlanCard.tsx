@@ -61,7 +61,7 @@ export function ReadingPlanCard({ plan, userProgress = 0 }: ReadingPlanCardProps
               {plan.description}
             </CardDescription>
           </div>
-          <Badge className={cn("text-xs", difficultyColors[plan.difficulty])}>
+          <Badge className={cn("text-xs", difficultyColors[plan.difficulty as keyof typeof difficultyColors])}>
             {plan.difficulty}
           </Badge>
         </div>

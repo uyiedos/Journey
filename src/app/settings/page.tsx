@@ -45,7 +45,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 export const dynamic = 'force-dynamic';
 
 export default function SettingsPage() {
-  const { user, updateSettings } = useUserData();
+  const { user, updateSettings, updateUser } = useUserData();
   const { user: authUser } = useAuth();
   
   // Account state
@@ -183,7 +183,7 @@ export default function SettingsPage() {
       console.log('Avatar updated:', publicUrl);
       
       // Update the user data context to reflect the new avatar immediately
-      updateSettings({ avatar: publicUrl });
+      updateUser({ avatar: publicUrl });
       
       // Update the auth user metadata as well
       await supabase.auth.updateUser({
