@@ -2,9 +2,6 @@
 
 import React from 'react';
 import { Layout } from '@/components/layout/Layout';
-import { AIReadingPlanGenerator } from '@/components/features/AIReadingPlanGenerator';
-import { AIDevotionalGenerator } from '@/components/features/AIDevotionalGenerator';
-import { AIBibleStudyHelper } from '@/components/features/AIBibleStudyHelper';
 import { VirgoAI } from '@/components/features/VirgoAI';
 import { AskVirgo } from '@/components/features/AskVirgo';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -27,8 +24,8 @@ export default function AIToolsPage() {
         </div>
 
         <AuthGuard action="ai-tools">
-          <Tabs defaultValue="virgo" className="w-full">
-            <TabsList className="grid w-full grid-cols-4">
+          <Tabs defaultValue="ask-virgo" className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="ask-virgo" className="flex items-center gap-2">
                 <MessageCircle className="h-4 w-4" />
                 Ask Virgo
@@ -36,14 +33,6 @@ export default function AIToolsPage() {
               <TabsTrigger value="virgo" className="flex items-center gap-2">
                 <Cross className="h-4 w-4" />
                 Divine Plans
-              </TabsTrigger>
-              <TabsTrigger value="devotionals" className="flex items-center gap-2">
-                <Heart className="h-4 w-4" />
-                Devotionals
-              </TabsTrigger>
-              <TabsTrigger value="bible-study" className="flex items-center gap-2">
-                <Star className="h-4 w-4" />
-                Bible Study
               </TabsTrigger>
             </TabsList>
 
@@ -53,14 +42,6 @@ export default function AIToolsPage() {
 
             <TabsContent value="virgo">
               <VirgoAI />
-            </TabsContent>
-
-            <TabsContent value="devotionals">
-              <AIDevotionalGenerator />
-            </TabsContent>
-
-            <TabsContent value="bible-study">
-              <AIBibleStudyHelper />
             </TabsContent>
           </Tabs>
         </AuthGuard>

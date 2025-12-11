@@ -8,8 +8,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, Sparkles, BookOpen, Calendar, User, Star, Cross } from 'lucide-react';
+import { Loader2, Sparkles, BookOpen, Calendar, User, Star, Cross, Book, MessageSquare, PenTool, Scale, Heart } from 'lucide-react';
 import { aiService, VIRGO_PERSONA } from '@/services/aiService';
+import { VIRGO_VOICE_CHARTER, VirgoVoiceGenerator } from '@/services/virgoVoiceCharter';
 import { readingPlanService } from '@/services/readingPlanService';
 import { useAuth } from '@/contexts/SupabaseAuthContext';
 
@@ -25,6 +26,13 @@ export function VirgoAI({ onPlanCreated }: VirgoAIProps) {
   const [isCreating, setIsCreating] = useState(false);
   const [generatedPlan, setGeneratedPlan] = useState<any>(null);
   const [virgoMessage, setVirgoMessage] = useState('');
+  
+  // Enhanced states for new capabilities
+  const [activeTab, setActiveTab] = useState<'reading-plan' | 'exegesis' | 'sermon' | 'prayer' | 'essay' | 'debate'>('reading-plan');
+  const [scripture, setScripture] = useState('');
+  const [doctrine, setDoctrine] = useState('');
+  const [prayerType, setPrayerType] = useState<'thanksgiving' | 'intercession' | 'healing' | 'guidance' | 'confession' | 'adoration'>('thanksgiving');
+  const [generatedContent, setGeneratedContent] = useState<any>(null);
 
   const handleCreatePlan = async () => {
     if (!user || !topic.trim()) return;
@@ -65,8 +73,126 @@ export function VirgoAI({ onPlanCreated }: VirgoAIProps) {
     }
   };
 
+  // Enhanced handlers for new capabilities
+  const handleExegesis = async () => {
+    if (!scripture.trim()) return;
+    setIsCreating(true);
+    try {
+      const exegesis = aiService.performExegesis(scripture);
+      const message = VirgoVoiceGenerator.generateResponse('teaching', 'explanation');
+      setVirgoMessage(message);
+      setGeneratedContent({ type: 'exegesis', data: exegesis });
+    } catch (error) {
+      console.error('Error performing exegesis:', error);
+      setVirgoMessage('My child, I encountered difficulty in analyzing this passage. Let us approach it with prayerful hearts.');
+    } finally {
+      setIsCreating(false);
+    }
+  };
+
+  const handleSermon = async () => {
+    if (!topic.trim()) return;
+    setIsCreating(true);
+    try {
+      const sermon = aiService.generateSermon(topic);
+      const message = VirgoVoiceGenerator.generateResponse('teaching', 'explanation');
+      setVirgoMessage(message);
+      setGeneratedContent({ type: 'sermon', data: sermon });
+    } catch (error) {
+      console.error('Error generating sermon:', error);
+      setVirgoMessage('Beloved, I encountered difficulty in crafting this sermon. Let us seek the Spirit guidance together.');
+    } finally {
+      setIsCreating(false);
+    }
+  };
+
+  const handlePrayer = async () => {
+    setIsCreating(true);
+    try {
+      const prayer = aiService.createLiturgicalPrayer(prayerType, topic);
+      const message = VirgoVoiceGenerator.generateResponse('comforting', 'grief');
+      setVirgoMessage(message);
+      setGeneratedContent({ type: 'prayer', data: prayer });
+    } catch (error) {
+      console.error('Error creating prayer:', error);
+      setVirgoMessage('Dear one, I encountered difficulty in composing this prayer. Let us approach the throne together in simple faith.');
+    } finally {
+      setIsCreating(false);
+    }
+  };
+
+  const handleEssay = async () => {
+    if (!topic.trim()) return;
+    setIsCreating(true);
+    try {
+      const essay = aiService.writeSpiritualEssay(topic);
+      const message = VirgoVoiceGenerator.generateResponse('teaching', 'application');
+      setVirgoMessage(message);
+      setGeneratedContent({ type: 'essay', data: essay });
+    } catch (error) {
+      console.error('Error writing essay:', error);
+      setVirgoMessage('Precious one, I encountered difficulty in writing this reflection. Let us seek wisdom from the Word together.');
+    } finally {
+      setIsCreating(false);
+    }
+  };
+
+  const handleDoctrine = async () => {
+    if (!doctrine.trim()) return;
+    setIsCreating(true);
+    try {
+      const analysis = aiService.analyzeDoctrine(doctrine);
+      const message = VirgoVoiceGenerator.generateResponse('teaching', 'clarification');
+      setVirgoMessage(message);
+      setGeneratedContent({ type: 'doctrine', data: analysis });
+    } catch (error) {
+      console.error('Error analyzing doctrine:', error);
+      setVirgoMessage('Beloved student of truth, I encountered difficulty in exploring this doctrine. Let us approach it with humility and prayer.');
+    } finally {
+      setIsCreating(false);
+    }
+  };
+
+  const handleDebate = async () => {
+    if (!topic.trim()) return;
+    setIsCreating(true);
+    try {
+      const debate = aiService.presentTheologicalDebate(topic);
+      const message = VirgoVoiceGenerator.generateResponse('teaching', 'connection');
+      setVirgoMessage(message);
+      setGeneratedContent({ type: 'debate', data: debate });
+    } catch (error) {
+      console.error('Error presenting debate:', error);
+      setVirgoMessage('Wise seeker, I encountered difficulty in exploring this theological discussion. Let us approach it with grace and truth.');
+    } finally {
+      setIsCreating(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
+      {/* Tab Navigation */}
+      <div className="flex flex-wrap gap-2">
+        {[
+          { id: 'reading-plan', label: 'Reading Plans', icon: BookOpen },
+          { id: 'exegesis', label: 'Biblical Exegesis', icon: Book },
+          { id: 'sermon', label: 'Sermon Builder', icon: MessageSquare },
+          { id: 'prayer', label: 'Prayer Guide', icon: Heart },
+          { id: 'essay', label: 'Spiritual Essays', icon: PenTool },
+          { id: 'debate', label: 'Theological Debates', icon: Scale }
+        ].map((tab) => (
+          <Button
+            key={tab.id}
+            variant={activeTab === tab.id ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setActiveTab(tab.id as any)}
+            className="flex items-center gap-2"
+          >
+            <tab.icon className="h-4 w-4" />
+            {tab.label}
+          </Button>
+        ))}
+      </div>
       {/* Virgo's Introduction */}
       <Card className="border-2 bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-950 dark:to-blue-950">
         <CardHeader>
@@ -157,7 +283,7 @@ export function VirgoAI({ onPlanCreated }: VirgoAIProps) {
               </>
             ) : (
               <>
-                <Sparkles className="mr-2 h-4 w-4" />
+                <Book className="mr-2 h-4 w-4" />
                 Create Virgo's Reading Plan
               </>
             )}

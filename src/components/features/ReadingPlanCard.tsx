@@ -46,6 +46,16 @@ export function ReadingPlanCard({ plan, userProgress = 0 }: ReadingPlanCardProps
       </CardHeader>
       
       <CardContent className="space-y-4">
+        {plan.image_url && (
+          <div>
+            <img
+              src={plan.image_url}
+              alt={plan.title}
+              className="w-full h-32 object-cover rounded-md"
+            />
+          </div>
+        )}
+
         <div className="flex items-center justify-between text-sm text-muted-foreground">
           <div className="flex items-center space-x-1">
             <Calendar className="h-4 w-4" />

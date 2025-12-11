@@ -55,6 +55,24 @@ class SupabaseService {
     return Math.floor(points / 100) + 1;
   }
 
+  // Daily action reward helpers (client-side caps)
+  private getDailyActionKey(userId: string, action: string): string {
+    const today = new Date().toISOString().split('T')[0];
+    return `journey:daily_reward:${userId}:${action}:${today}`;
+  }
+
+  private hasReceivedDailyActionReward(userId: string, action: string): boolean {
+    if (typeof window === 'undefined') return false;
+    const key = this.getDailyActionKey(userId, action);
+    return window.localStorage.getItem(key) === '1';
+  }
+
+  private setDailyActionReward(userId: string, action: string): void {
+    if (typeof window === 'undefined') return;
+    const key = this.getDailyActionKey(userId, action);
+    window.localStorage.setItem(key, '1');
+  }
+
   // Helper method to get supabase client
   getClient() {
     return supabase;
@@ -514,6 +532,22 @@ class SupabaseService {
 
       // Fetch the updated profile to return
       const updatedProfile = await this.getUserProfile(userId);
+      
+      // Create notification for points change
+      if (updatedProfile && points !== 0) {
+        try {
+          const { communityService } = await import('./communityService');
+          
+          if (points > 0) {
+            await communityService.createNotification(userId, 'points_awarded', 'Points earned', `You earned +${points} points.`, { delta: points });
+          } else if (points < 0) {
+            await communityService.createNotification(userId, 'points_spent', 'Points spent', `You spent ${Math.abs(points)} points.`, { delta: points });
+          }
+        } catch (notifError) {
+          console.warn('Could not create notification:', notifError);
+        }
+      }
+      
       return updatedProfile;
     } catch (err) {
       console.error('Unexpected error in addPoints:', err);
@@ -563,6 +597,7 @@ class SupabaseService {
     verse_text?: string;
     author_name?: string;
     tags?: string[];
+    image_url?: string;
     is_public?: boolean;
   }): Promise<any> {
     try {
@@ -590,6 +625,7 @@ class SupabaseService {
           verse_text: devotionalData.verse_text,
           author_name: devotionalData.author_name || 'Anonymous',
           tags: devotionalData.tags || [],
+          image_url: devotionalData.image_url || null,
           is_public: devotionalData.is_public !== false,
         })
         .select()
@@ -607,8 +643,11 @@ class SupabaseService {
         return null;
       }
 
-      // Award points for creating devotional
-      await this.addPoints(userId, 20); // 20 points for creating a devotional
+      // Award points for creating devotional (once per day)
+      if (!this.hasReceivedDailyActionReward(userId, 'create_devotional')) {
+        await this.addPoints(userId, 20); // 20 points for creating a devotional
+        this.setDailyActionReward(userId, 'create_devotional');
+      }
       await this.createDevotional(userId);
 
       return data;
@@ -627,9 +666,10 @@ class SupabaseService {
     title: string;
     description?: string;
     duration: number;
-    difficulty?: 'beginner' | 'intermediate' | 'advanced';
+    difficulty: 'beginner' | 'intermediate' | 'advanced';
     category?: string;
     verses_per_day?: number;
+    image_url?: string;
     is_public?: boolean;
   }): Promise<any> {
     try {
@@ -640,9 +680,10 @@ class SupabaseService {
           title: planData.title,
           description: planData.description,
           duration: planData.duration,
-          difficulty: planData.difficulty || 'beginner',
+          difficulty: planData.difficulty,
           category: planData.category,
           verses_per_day: planData.verses_per_day || 3,
+          image_url: planData.image_url || null,
           is_public: planData.is_public !== false,
         })
         .select()
@@ -653,8 +694,11 @@ class SupabaseService {
         return null;
       }
 
-      // Award points for creating reading plan
-      await this.addPoints(userId, 15); // 15 points for creating a reading plan
+      // Award points for creating reading plan (once per day)
+      if (!this.hasReceivedDailyActionReward(userId, 'create_reading_plan')) {
+        await this.addPoints(userId, 15); // 15 points for creating a reading plan
+        this.setDailyActionReward(userId, 'create_reading_plan');
+      }
 
       return data;
     } catch (error) {
@@ -777,6 +821,26 @@ class SupabaseService {
       if (error) {
         console.error('Error unlocking achievement:', error);
         return false;
+      }
+
+      // Create notification for achievement unlock
+      try {
+        const achievements = require('@/data/achievements').achievements;
+        const achievement = achievements.find((a: any) => a.id === achievementId);
+        
+        if (achievement) {
+          const { communityService } = await import('./communityService');
+          
+          await communityService.createNotification(
+            userId, 
+            'achievement_unlocked', 
+            'New achievement unlocked', 
+            `You unlocked "${achievement.name}" (+${achievement.points || 0} points).`,
+            { achievementId }
+          );
+        }
+      } catch (notifError) {
+        console.warn('Could not create achievement notification:', notifError);
       }
 
       return true;
@@ -1678,8 +1742,11 @@ class SupabaseService {
         throw error;
       }
       
-      // Award points for creating a community post
-      await this.addPoints(userId, 5); // 5 points for creating a post
+      // Award points for creating a community post (once per day)
+      if (!this.hasReceivedDailyActionReward(userId, 'create_community_post')) {
+        await this.addPoints(userId, 5); // 5 points for creating a post
+        this.setDailyActionReward(userId, 'create_community_post');
+      }
       
       // Transform the data to match expected format
       return {
@@ -1751,6 +1818,25 @@ class SupabaseService {
 
   async createCommunityComment(userId: string, postId: string, content: string): Promise<any> {
     try {
+      // Get post author to reward points correctly
+      const { data: postData, error: postError } = await supabase
+        .from('community_posts')
+        .select('user_id')
+        .eq('id', postId)
+        .single();
+
+      if (postError || !postData) {
+        throw postError || new Error('Post not found');
+      }
+
+      const authorId = postData.user_id as string;
+
+      // Ensure commenter has enough points to "thank" the author
+      const commenterProfile = await this.getUserProfile(userId);
+      if (!commenterProfile || (commenterProfile.points || 0) < 2) {
+        throw new Error('Not enough points to comment');
+      }
+
       const { data, error } = await supabase
         .from('community_comments')
         .insert({
@@ -1771,10 +1857,30 @@ class SupabaseService {
         .single();
 
       if (error) throw error;
-      
-      // Award points for commenting
-      await this.addPoints(userId, 2); // 2 points for commenting
-      
+
+      // Transfer points: commenter pays 2 points, author receives 2 points
+      await this.addPoints(userId, -2);
+      if (authorId && authorId !== userId) {
+        await this.addPoints(authorId, 2);
+      }
+
+      // Create notification for post author about the comment
+      if (authorId && authorId !== userId) {
+        try {
+          const { communityService } = await import('./communityService');
+          
+          await communityService.createNotification(
+            authorId,
+            'post_comment',
+            'Your post has a comment',
+            'Someone commented on your post',
+            { postId, fromUserId: userId }
+          );
+        } catch (notifError) {
+          console.warn('Could not create comment notification:', notifError);
+        }
+      }
+
       return data;
     } catch (error) {
       console.error('Error creating community comment:', error);
@@ -1803,7 +1909,25 @@ class SupabaseService {
         if (error) throw error;
         return false; // Unliked
       } else {
-        // Like
+        // Like – ensure user has enough points
+        const likerProfile = await this.getUserProfile(userId);
+        if (!likerProfile || (likerProfile.points || 0) < 2) {
+          throw new Error('Not enough points to like');
+        }
+
+        // Get post author to reward points correctly
+        const { data: postData, error: postError } = await supabase
+          .from('community_posts')
+          .select('user_id')
+          .eq('id', postId)
+          .single();
+
+        if (postError || !postData) {
+          throw postError || new Error('Post not found');
+        }
+
+        const authorId = postData.user_id as string;
+
         const { error } = await supabase
           .from('community_likes')
           .insert({
@@ -1812,10 +1936,30 @@ class SupabaseService {
           });
 
         if (error) throw error;
-        
-        // Award points for liking
-        await this.addPoints(userId, 1); // 1 point for liking
-        
+
+        // Transfer points: liker pays 2 points, author receives 2 points
+        await this.addPoints(userId, -2);
+        if (authorId && authorId !== userId) {
+          await this.addPoints(authorId, 2);
+        }
+
+        // Create notification for post author about the like
+        if (authorId && authorId !== userId) {
+          try {
+            const { communityService } = await import('./communityService');
+            
+            await communityService.createNotification(
+              authorId,
+              'post_like',
+              'Your post was liked',
+              'Someone liked your post (+2 points)',
+              { postId, fromUserId: userId, points: 2 }
+            );
+          } catch (notifError) {
+            console.warn('Could not create like notification:', notifError);
+          }
+        }
+
         return true; // Liked
       }
     } catch (error) {

@@ -576,6 +576,16 @@ export default function CommunityPage() {
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-4">
+                        {post.image_url && (
+                          <div>
+                            <img
+                              src={post.image_url}
+                              alt={post.title || 'Community post image'}
+                              className="w-full h-48 object-cover rounded-md"
+                            />
+                          </div>
+                        )}
+
                         <p className="text-sm leading-relaxed">{post.content}</p>
                         
                         {post.verse_reference && (

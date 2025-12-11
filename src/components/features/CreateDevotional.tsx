@@ -7,15 +7,14 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ImageUpload } from '@/components/ui/ImageUpload';
-import { sampleVerses } from '@/data/bibles';
+import { books } from '@/data/bibles';
 import { supabaseService } from '@/services/supabaseService';
 import { imageService, ImageUpload as ImageUploadType } from '@/services/imageService';
 import { aiService } from '@/services/aiService';
 import { useAuth } from '@/contexts/SupabaseAuthContext';
 import { useUserData } from '@/contexts/UserDataContext';
-import { Plus, X, Save, Loader2, Sparkles } from 'lucide-react';
+import { Plus, X, Save, Loader2 } from 'lucide-react';
 
 interface CreateDevotionalProps {
   onSave?: (devotional: any) => void;
@@ -27,16 +26,33 @@ export function CreateDevotional({ onSave, onCancel }: CreateDevotionalProps) {
   const { refreshData } = useUserData();
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const [selectedVerse, setSelectedVerse] = useState('');
+
+  // Bible reference selection
+  const [selectedBookId, setSelectedBookId] = useState('');
+  const [selectedChapter, setSelectedChapter] = useState('');
+  const [selectedVerseFrom, setSelectedVerseFrom] = useState('');
+  const [selectedVerseTo, setSelectedVerseTo] = useState('');
   const [tags, setTags] = useState<string[]>([]);
   const [newTag, setNewTag] = useState('');
   const [uploadedImages, setUploadedImages] = useState<ImageUploadType[]>([]);
   const [isSaving, setIsSaving] = useState(false);
-  const [isGenerating, setIsGenerating] = useState(false);
   const [aiTopic, setAiTopic] = useState('');
+  const [imageUrl, setImageUrl] = useState('');
 
   // Automatically set author to current user
   const authorName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Anonymous';
+
+  // Derived values for chapter selection
+  const selectedBook = selectedBookId ? books.find(b => b.id === selectedBookId) : undefined;
+  const chapterCount = selectedBook?.chapters || 0;
+  const chapterNumbers = Array.from({ length: chapterCount }, (_, i) => (i + 1).toString());
+
+  // Human-readable verse reference for UI preview
+  const verseReferenceDisplay = selectedBook && selectedChapter && selectedVerseFrom
+    ? `${selectedBook.name} ${selectedChapter}:${selectedVerseFrom}${
+        selectedVerseTo && selectedVerseTo !== selectedVerseFrom ? `-${selectedVerseTo}` : ''
+      }`
+    : '';
 
   const handleAddTag = () => {
     if (newTag.trim() && !tags.includes(newTag.trim())) {
@@ -50,26 +66,7 @@ export function CreateDevotional({ onSave, onCancel }: CreateDevotionalProps) {
   };
 
   const handleAIGenerate = async () => {
-    if (!aiTopic.trim()) return;
-
-    setIsGenerating(true);
-    try {
-      const devotional = aiService.generateDevotional('', aiTopic);
-      
-      setTitle(devotional.title);
-      setContent(devotional.main_message + '\n\nApplication: ' + devotional.application + '\n\nPrayer: ' + devotional.prayer);
-      setSelectedVerse(devotional.verse);
-      
-      // Add relevant tags
-      const newTags = ['devotional', aiTopic.toLowerCase()];
-      setTags([...new Set([...tags, ...newTags])]);
-      
-    } catch (error) {
-      console.error('Error generating AI devotional:', error);
-      alert('Failed to generate devotional. Please try again.');
-    } finally {
-      setIsGenerating(false);
-    }
+    return;
   };
 
   const handleSave = async () => {
@@ -86,15 +83,28 @@ export function CreateDevotional({ onSave, onCancel }: CreateDevotionalProps) {
     setIsSaving(true);
     
     try {
-      const selectedVerseData = sampleVerses.find(v => v.id === selectedVerse);
-      
+      // Build verse reference string if all required parts are present
+      let verseReference: string | undefined = undefined;
+
+      if (selectedBookId && selectedChapter && selectedVerseFrom) {
+        const book = books.find(b => b.id === selectedBookId);
+        const bookName = book?.name || selectedBookId;
+
+        if (selectedVerseTo && selectedVerseTo !== selectedVerseFrom) {
+          verseReference = `${bookName} ${selectedChapter}:${selectedVerseFrom}-${selectedVerseTo}`;
+        } else {
+          verseReference = `${bookName} ${selectedChapter}:${selectedVerseFrom}`;
+        }
+      }
+
       const devotionalData = {
         title: title.trim(),
         content: content.trim(),
-        verse_reference: selectedVerseData ? `Verse ${selectedVerseData.number}` : undefined,
-        verse_text: selectedVerseData ? selectedVerseData.text : undefined,
+        verse_reference: verseReference,
+        // verse_text can be populated in the future from a Bible API
         author_name: authorName,
         tags: tags.length > 0 ? tags : undefined,
+        image_url: imageUrl.trim() || undefined,
         is_public: true,
       };
 
@@ -118,9 +128,13 @@ export function CreateDevotional({ onSave, onCancel }: CreateDevotionalProps) {
         // Reset form
         setTitle('');
         setContent('');
-        setSelectedVerse('');
+        setSelectedBookId('');
+        setSelectedChapter('');
+        setSelectedVerseFrom('');
+        setSelectedVerseTo('');
         setTags([]);
         setNewTag('');
+        setImageUrl('');
         setUploadedImages([]);
         
         console.log('Devotional created successfully:', result);
@@ -161,16 +175,7 @@ export function CreateDevotional({ onSave, onCancel }: CreateDevotionalProps) {
       </CardHeader>
       
       <CardContent className="space-y-6">
-        <Tabs defaultValue="manual" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="manual">Manual</TabsTrigger>
-            <TabsTrigger value="ai" className="flex items-center gap-2">
-              <Sparkles className="h-4 w-4" />
-              AI Assist
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="manual" className="space-y-6">
+        <div className="space-y-6">
             {/* Title */}
             <div className="space-y-2">
               <label className="text-sm font-medium">Title *</label>
@@ -182,26 +187,93 @@ export function CreateDevotional({ onSave, onCancel }: CreateDevotionalProps) {
           />
         </div>
 
-        {/* Bible Verse */}
+        {/* Bible Reference */}
         <div className="space-y-2">
-          <label className="text-sm font-medium">Bible Verse</label>
-          <Select value={selectedVerse} onValueChange={setSelectedVerse} disabled={isSaving}>
-            <SelectTrigger>
-              <SelectValue placeholder="Select a verse..." />
-            </SelectTrigger>
-            <SelectContent>
-              {sampleVerses.map((verse) => (
-                <SelectItem key={verse.id} value={verse.id}>
-                  <div className="space-y-1">
-                    <div className="font-medium">Verse {verse.number}</div>
-                    <div className="text-sm text-muted-foreground line-clamp-2">
-                      {verse.text}
-                    </div>
-                  </div>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <label className="text-sm font-medium">Bible Reference (Optional)</label>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-2">
+            {/* Book */}
+            <div className="space-y-1 md:col-span-2">
+              <span className="text-xs text-muted-foreground">Book</span>
+              <Select
+                value={selectedBookId}
+                onValueChange={(value) => {
+                  setSelectedBookId(value);
+                  setSelectedChapter('');
+                  setSelectedVerseFrom('');
+                  setSelectedVerseTo('');
+                }}
+                disabled={isSaving}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select book" />
+                </SelectTrigger>
+                <SelectContent>
+                  {books.map((book) => (
+                    <SelectItem key={book.id} value={book.id}>
+                      {book.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Chapter */}
+            <div className="space-y-1">
+              <span className="text-xs text-muted-foreground">Chapter</span>
+              <Select
+                value={selectedChapter}
+                onValueChange={(value) => {
+                  setSelectedChapter(value);
+                  setSelectedVerseFrom('');
+                  setSelectedVerseTo('');
+                }}
+                disabled={isSaving || !selectedBookId}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder={selectedBookId ? 'Chapter' : 'Select book first'} />
+                </SelectTrigger>
+                <SelectContent>
+                  {chapterNumbers.map((ch) => (
+                    <SelectItem key={ch} value={ch}>
+                      {ch}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Verses */}
+            <div className="space-y-1">
+              <span className="text-xs text-muted-foreground">Verses</span>
+              <div className="flex items-center gap-1">
+                <Input
+                  type="number"
+                  min={1}
+                  placeholder="From"
+                  value={selectedVerseFrom}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSelectedVerseFrom(e.target.value)}
+                  disabled={isSaving || !selectedChapter}
+                  className="w-16"
+                />
+                <span className="text-xs text-muted-foreground">-</span>
+                <Input
+                  type="number"
+                  min={1}
+                  placeholder="To"
+                  value={selectedVerseTo}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSelectedVerseTo(e.target.value)}
+                  disabled={isSaving || !selectedChapter}
+                  className="w-16"
+                />
+              </div>
+            </div>
+          </div>
+          {selectedBook && selectedChapter && selectedVerseFrom && (
+            <p className="text-xs text-muted-foreground">
+              Selected: {selectedBook.name} {selectedChapter}:{selectedVerseFrom}
+              {selectedVerseTo && selectedVerseTo !== selectedVerseFrom ? `-${selectedVerseTo}` : ''}
+            </p>
+          )}
         </div>
 
         {/* Content */}
@@ -247,6 +319,17 @@ export function CreateDevotional({ onSave, onCancel }: CreateDevotionalProps) {
           )}
         </div>
 
+        {/* Image URL */}
+        <div className="space-y-2">
+          <label className="text-sm font-medium">Image URL (Optional)</label>
+          <Input
+            placeholder="https://example.com/your-image.jpg"
+            value={imageUrl}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setImageUrl(e.target.value)}
+            disabled={isSaving}
+          />
+        </div>
+
         {/* Images */}
         <div className="space-y-2">
           <label className="text-sm font-medium">Images (Optional)</label>
@@ -265,9 +348,9 @@ export function CreateDevotional({ onSave, onCancel }: CreateDevotionalProps) {
             <Card>
               <CardContent className="p-4">
                 <h3 className="font-semibold mb-2">{title || 'Untitled'}</h3>
-                {selectedVerse && (
+                {verseReferenceDisplay && (
                   <div className="text-sm text-muted-foreground mb-3 italic">
-                    "{sampleVerses.find(v => v.id === selectedVerse)?.text}"
+                    {verseReferenceDisplay}
                   </div>
                 )}
                 <p className="text-sm text-muted-foreground mb-3">
@@ -290,125 +373,7 @@ export function CreateDevotional({ onSave, onCancel }: CreateDevotionalProps) {
             </Card>
           </div>
         )}
-          </TabsContent>
-
-          <TabsContent value="ai" className="space-y-6">
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Topic or Theme</label>
-                <Input
-                  placeholder="e.g., Faith, Prayer, Forgiveness, God's Love..."
-                  value={aiTopic}
-                  onChange={(e) => setAiTopic(e.target.value)}
-                  disabled={isGenerating}
-                />
-              </div>
-
-              <Button 
-                onClick={handleAIGenerate}
-                disabled={!aiTopic.trim() || isGenerating}
-                className="w-full"
-              >
-                {isGenerating ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Generating...
-                  </>
-                ) : (
-                  <>
-                    <Sparkles className="mr-2 h-4 w-4" />
-                    Generate Devotional
-                  </>
-                )}
-              </Button>
-
-              {(title || content) && (
-                <div className="space-y-4 border rounded-lg p-4 bg-muted/50">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Generated Title</label>
-                    <Input
-                      value={title}
-                      onChange={(e) => setTitle(e.target.value)}
-                      placeholder="Generated title will appear here..."
-                      disabled={isSaving}
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Generated Content</label>
-                    <Textarea
-                      value={content}
-                      onChange={(e) => setContent(e.target.value)}
-                      placeholder="Generated devotional content will appear here..."
-                      className="min-h-[200px]"
-                      disabled={isSaving}
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Bible Verse</label>
-                    <Select value={selectedVerse} onValueChange={setSelectedVerse} disabled={isSaving}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a Bible verse..." />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {sampleVerses.map((verse) => (
-                          <SelectItem key={verse.id} value={verse.id}>
-                            {verse.id.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {/* Tags */}
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Tags</label>
-                    <div className="flex gap-2">
-                      <Input
-                        placeholder="Add a tag..."
-                        value={newTag}
-                        onChange={(e) => setNewTag(e.target.value)}
-                        onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddTag())}
-                        disabled={isSaving}
-                      />
-                      <Button type="button" variant="outline" onClick={handleAddTag} disabled={isSaving}>
-                        Add
-                      </Button>
-                    </div>
-                    {tags.length > 0 && (
-                      <div className="flex flex-wrap gap-1">
-                        {tags.map((tag) => (
-                          <Badge key={tag} variant="outline" className="cursor-pointer">
-                            #{tag}
-                            <button
-                              type="button"
-                              onClick={() => handleRemoveTag(tag)}
-                              className="ml-1 text-xs hover:text-destructive"
-                            >
-                              ×
-                            </button>
-                          </Badge>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Images */}
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Images (Optional)</label>
-                    <ImageUpload
-                      onImagesChange={setUploadedImages}
-                      maxImages={3}
-                      maxFileSize={1 * 1024 * 1024}
-                      className="w-full"
-                    />
-                  </div>
-                </div>
-              )}
-            </div>
-          </TabsContent>
-        </Tabs>
+      </div>
       </CardContent>
     </Card>
   );

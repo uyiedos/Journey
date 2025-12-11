@@ -9,6 +9,7 @@ import { useTheme } from '@/contexts/ThemeContext';
 import { useUserData } from '@/contexts/UserDataContext';
 import { useAuth } from '@/contexts/SupabaseAuthContext';
 import { MobileNavigation } from './MobileNavigation';
+import { NotificationBell } from './NotificationBell';
 import { BookOpen, Users, Heart, Trophy, Menu, Search, LogIn, LogOut, Bell, Sparkles, Flame } from 'lucide-react';
 
 export function Header() {
@@ -50,15 +51,8 @@ export function Header() {
             <Search className="h-4 w-4" />
           </Button>
 
-          {/* Notifications - Smaller on mobile */}
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="relative h-8 w-8 sm:h-10 sm:w-10 rounded-full hover:bg-primary/10 transition-all duration-200"
-          >
-            <Bell className="h-4 w-4" />
-            <span className="absolute -top-1 -right-1 h-2 w-2 sm:h-3 sm:w-3 bg-red-500 rounded-full border-2 border-background" />
-          </Button>
+          {/* Notifications - Dynamic */}
+          {authUser && <NotificationBell />}
 
           {/* User Stats - Enhanced */}
           {authUser ? (
@@ -77,7 +71,7 @@ export function Header() {
 
               {/* User Avatar - Enhanced */}
               <div className="flex items-center space-x-1 sm:space-x-2">
-                <div className="relative">
+                <Link href="/profile" className="relative">
                   <Avatar className="h-7 w-7 sm:h-9 sm:w-9 md:h-10 md:w-10 ring-2 ring-primary/10">
                     <AvatarImage src={user?.avatar} />
                     <AvatarFallback className="bg-linear-to-br from-blue-400 to-purple-500 text-white font-medium text-sm">
@@ -85,9 +79,9 @@ export function Header() {
                     </AvatarFallback>
                   </Avatar>
                   <div className="absolute -bottom-1 -right-1 w-2 h-2 sm:w-3 sm:h-3 bg-green-500 rounded-full border-2 border-background" />
-                </div>
+                </Link>
                 <div className="hidden md:block">
-                  <Link href="/settings" className="text-sm font-medium hover:text-primary transition-colors">
+                  <Link href="/profile" className="text-sm font-medium hover:text-primary transition-colors">
                     {user?.username || authUser.email?.split('@')[0]}
                   </Link>
                   <div className="flex items-center space-x-2">

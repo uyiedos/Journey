@@ -104,7 +104,7 @@ const EventsPage: React.FC = () => {
     setNewEvent({ title: '', description: '', videoUrl: '', startsAt: '', tags: '' });
 
     try {
-      await supabaseService.addPoints(authUser.id, 10);
+      await supabaseService.addPoints(authUser.id, 500);
     } catch (error) {
       console.error('Error awarding points for event creation:', error);
     }

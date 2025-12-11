@@ -1,14 +1,15 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Layout } from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { achievements, getAchievementsByCategory } from '@/data/achievements';
+import { achievements } from '@/data/achievements';
 import { useUserData } from '@/contexts/UserDataContext';
+import { supabaseService } from '@/services/supabaseService';
 import { Trophy, Star, Target, BookOpen, Users, Flame, Calendar, Award, Lock } from 'lucide-react';
 
 // Force dynamic rendering
@@ -18,6 +19,17 @@ export default function AchievementsPage() {
   const { user } = useUserData();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [showLocked, setShowLocked] = useState(true);
+  const [userAchievements, setUserAchievements] = useState<any[]>([]);
+
+  useEffect(() => {
+    const loadUserAchievements = async () => {
+      if (!user?.id) return;
+      const data = await supabaseService.getUserAchievements(user.id);
+      setUserAchievements(data || []);
+    };
+
+    loadUserAchievements();
+  }, [user?.id]);
 
   // Return loading state if user data is not available
   if (!user) {
@@ -44,13 +56,13 @@ export default function AchievementsPage() {
 
   const filteredAchievements = achievements.filter(achievement => {
     const matchesCategory = !selectedCategory || achievement.category === selectedCategory;
-    const isUnlocked = user?.achievements.some(a => a.id === achievement.id);
+    const isUnlocked = userAchievements.some(a => a.achievement_id === achievement.id);
     const shouldShow = showLocked || isUnlocked;
     
     return matchesCategory && shouldShow;
   });
 
-  const unlockedCount = user?.achievements.length || 0;
+  const unlockedCount = userAchievements.length || 0;
   const totalCount = achievements.length;
   const progressPercentage = (unlockedCount / totalCount) * 100;
 
@@ -128,7 +140,7 @@ export default function AchievementsPage() {
         {/* Achievements Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredAchievements.map((achievement) => {
-            const isUnlocked = user?.achievements.some(a => a.id === achievement.id);
+            const isUnlocked = userAchievements.some(a => a.achievement_id === achievement.id);
             const Icon = categoryIcons[achievement.category as keyof typeof categoryIcons] || Star;
             
             return (

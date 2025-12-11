@@ -122,7 +122,17 @@ export interface GroupMembership {
 export interface Notification {
   id: string;
   user_id: string;
-  type: 'friend_request' | 'friend_accepted' | 'message' | 'post_like' | 'post_comment' | 'group_invite' | 'prayer_support';
+  type:
+    | 'friend_request'
+    | 'friend_accepted'
+    | 'message'
+    | 'post_like'
+    | 'post_comment'
+    | 'group_invite'
+    | 'prayer_support'
+    | 'points_awarded'
+    | 'points_spent'
+    | 'achievement_unlocked';
   title: string;
   message: string;
   data?: Record<string, any>;
@@ -566,7 +576,7 @@ class CommunityService {
   }
 
   // Notifications
-  async getNotifications(userId: string, limit: number = 20): Promise<Notification[]> {
+  async getNotifications(userId: string, limit: number = 50): Promise<Notification[]> {
     try {
       const { data, error } = await supabaseClient
         .from('notifications')
@@ -575,10 +585,16 @@ class CommunityService {
         .order('created_at', { ascending: false })
         .limit(limit);
 
-      if (error) throw error;
+      if (error) {
+        // Gracefully handle database/RLS issues without noisy console errors
+        console.warn('Could not fetch notifications (database or RLS issue). Returning empty list.');
+        return [];
+      }
+
       return data || [];
     } catch (error) {
-      console.error('Error getting notifications:', error);
+      // Catch-all safeguard that avoids spamming errors in the console
+      console.warn('Unexpected error getting notifications. Returning empty list.');
       return [];
     }
   }
@@ -594,6 +610,21 @@ class CommunityService {
       return true;
     } catch (error) {
       console.error('Error marking notification as read:', error);
+      return false;
+    }
+  }
+
+  async markAllNotificationsAsRead(userId: string): Promise<boolean> {
+    try {
+      const { error } = await supabaseClient
+        .from('notifications')
+        .update({ is_read: true })
+        .eq('user_id', userId);
+
+      if (error) throw error;
+      return true;
+    } catch (error) {
+      console.error('Error marking all notifications as read:', error);
       return false;
     }
   }

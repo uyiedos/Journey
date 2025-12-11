@@ -53,6 +53,16 @@ BEGIN
     IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'users' AND column_name = 'full_name') THEN
         ALTER TABLE users ADD COLUMN full_name TEXT;
     END IF;
+
+    -- Add image_url to devotionals for lightweight external images
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'devotionals' AND column_name = 'image_url') THEN
+        ALTER TABLE devotionals ADD COLUMN image_url VARCHAR(500);
+    END IF;
+
+    -- Add image_url to reading_plans for lightweight external images
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'reading_plans' AND column_name = 'image_url') THEN
+        ALTER TABLE reading_plans ADD COLUMN image_url VARCHAR(500);
+    END IF;
 END $$;
 
 -- Create referrals table

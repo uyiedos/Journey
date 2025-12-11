@@ -137,6 +137,7 @@ export interface Devotional {
   shares: number;
   shares_count?: number;      // Database field
   comments_count?: number;   // Database field
+  image_url?: string;        // Database field
 }
 
 export interface ReadingPlan {
@@ -148,6 +149,7 @@ export interface ReadingPlan {
   readings: ReadingPlanItem[];
   participants: number;
   rating: number;
+  image_url?: string;        // Database field
 }
 
 export interface ReadingPlanItem {

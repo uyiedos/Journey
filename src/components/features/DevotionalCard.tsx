@@ -56,6 +56,16 @@ export function DevotionalCard({ devotional }: DevotionalCardProps) {
       </CardHeader>
       
       <CardContent>
+        {devotional.image_url && (
+          <div className="mb-3">
+            <img
+              src={devotional.image_url}
+              alt={devotional.title}
+              className="w-full h-40 object-cover rounded-md"
+            />
+          </div>
+        )}
+
         <p className="text-sm text-muted-foreground mb-4 line-clamp-3">
           {devotional.content}
         </p>

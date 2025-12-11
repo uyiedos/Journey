@@ -7,10 +7,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Plus, X, Save, Calendar, Clock, Users, Sparkles, Loader2 } from 'lucide-react';
+import { Plus, X, Save, Calendar, Clock, Users } from 'lucide-react';
 import { supabaseService } from '@/services/supabaseService';
-import { aiService } from '@/services/aiService';
 import { useAuth } from '@/contexts/SupabaseAuthContext';
 
 interface CreateReadingPlanProps {
@@ -26,8 +24,7 @@ export function CreateReadingPlan({ onSave, onCancel }: CreateReadingPlanProps) 
   const [readings, setReadings] = useState<any[]>([]);
   const [newReading, setNewReading] = useState({ title: '', passages: '', devotional: '' });
   const [loading, setLoading] = useState(false);
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [aiTopic, setAiTopic] = useState('');
+  const [imageUrl, setImageUrl] = useState('');
   
   const { user } = useAuth();
 
@@ -50,39 +47,7 @@ export function CreateReadingPlan({ onSave, onCancel }: CreateReadingPlanProps) 
   };
 
   const handleAIGenerate = async () => {
-    if (!aiTopic.trim()) return;
-
-    setIsGenerating(true);
-    try {
-      const readingPlan = aiService.generateReadingPlanFromTemplate({
-        topic: aiTopic,
-        duration: parseInt(duration) || 7,
-        difficulty: difficulty
-      });
-      
-      setTitle(readingPlan.title);
-      setDescription(readingPlan.description);
-      setDuration(readingPlan.duration.toString());
-      setDifficulty(readingPlan.difficulty);
-      
-      // Convert AI readings to component format
-      const formattedReadings = readingPlan.readings.map((reading, index) => ({
-        id: 'reading-' + Date.now() + index,
-        day: reading.day,
-        title: reading.title,
-        passages: reading.passages,
-        devotional: reading.devotional,
-        completed: false
-      }));
-      
-      setReadings(formattedReadings);
-      
-    } catch (error) {
-      console.error('Error generating AI reading plan:', error);
-      alert('Failed to generate reading plan. Please try again.');
-    } finally {
-      setIsGenerating(false);
-    }
+    return;
   };
 
   const handleSave = async () => {
@@ -105,6 +70,7 @@ export function CreateReadingPlan({ onSave, onCancel }: CreateReadingPlanProps) 
         description,
         duration: parseInt(duration),
         difficulty,
+        image_url: imageUrl.trim() || undefined,
         is_public: true
       });
 
@@ -143,16 +109,7 @@ export function CreateReadingPlan({ onSave, onCancel }: CreateReadingPlanProps) 
       </CardHeader>
       
       <CardContent className="space-y-6">
-        <Tabs defaultValue="manual" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="manual">Manual</TabsTrigger>
-            <TabsTrigger value="ai" className="flex items-center gap-2">
-              <Sparkles className="h-4 w-4" />
-              AI Assist
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="manual" className="space-y-6">
+        <div className="space-y-6">
             {/* Title */}
             <div className="space-y-2">
               <label className="text-sm font-medium">Title</label>
@@ -262,6 +219,16 @@ export function CreateReadingPlan({ onSave, onCancel }: CreateReadingPlanProps) 
           ))}
         </div>
 
+        {/* Image URL */}
+        <div className="space-y-2">
+          <label className="text-sm font-medium">Image URL (optional)</label>
+          <Input
+            placeholder="https://example.com/plan-image.jpg"
+            value={imageUrl}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setImageUrl(e.target.value)}
+          />
+        </div>
+
         {/* Preview */}
         {(title || description || readings.length > 0) && (
           <div className="space-y-2">
@@ -293,127 +260,7 @@ export function CreateReadingPlan({ onSave, onCancel }: CreateReadingPlanProps) 
             </Card>
           </div>
         )}
-          </TabsContent>
-
-          <TabsContent value="ai" className="space-y-6">
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Topic</label>
-                  <Input
-                    placeholder="e.g., Prayer, Faith, Forgiveness..."
-                    value={aiTopic}
-                    onChange={(e) => setAiTopic(e.target.value)}
-                    disabled={isGenerating}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Duration (days)</label>
-                  <Input
-                    type="number"
-                    placeholder="7"
-                    value={duration}
-                    onChange={(e) => setDuration(e.target.value)}
-                    disabled={isGenerating}
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Difficulty</label>
-                <Select value={difficulty} onValueChange={(value: any) => setDifficulty(value)} disabled={isGenerating}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="beginner">Beginner</SelectItem>
-                    <SelectItem value="intermediate">Intermediate</SelectItem>
-                    <SelectItem value="advanced">Advanced</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <Button 
-                onClick={handleAIGenerate}
-                disabled={!aiTopic.trim() || isGenerating}
-                className="w-full"
-              >
-                {isGenerating ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Generating...
-                  </>
-                ) : (
-                  <>
-                    <Sparkles className="mr-2 h-4 w-4" />
-                    Generate Reading Plan
-                  </>
-                )}
-              </Button>
-
-              {(title || readings.length > 0) && (
-                <div className="space-y-4 border rounded-lg p-4 bg-muted/50">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Generated Title</label>
-                    <Input
-                      value={title}
-                      onChange={(e) => setTitle(e.target.value)}
-                      placeholder="Generated title will appear here..."
-                      disabled={loading}
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Generated Description</label>
-                    <Textarea
-                      value={description}
-                      onChange={(e) => setDescription(e.target.value)}
-                      placeholder="Generated description will appear here..."
-                      className="min-h-[100px]"
-                      disabled={loading}
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Generated Readings ({readings.length})</label>
-                    <div className="space-y-2 max-h-60 overflow-y-auto">
-                      {readings.map((reading, index) => (
-                        <Card key={reading.id}>
-                          <CardContent className="p-3">
-                            <div className="flex items-center justify-between">
-                              <div className="flex-1">
-                                <div className="flex items-center gap-2 mb-1">
-                                  <Badge variant="outline">Day {reading.day}</Badge>
-                                  <h4 className="font-semibold text-sm">{reading.title}</h4>
-                                </div>
-                                <div className="text-xs text-muted-foreground">
-                                  <strong>Passages:</strong> {reading.passages.join(', ')}
-                                </div>
-                                {reading.devotional && (
-                                  <div className="text-xs text-muted-foreground italic mt-1">
-                                    {reading.devotional.substring(0, 100)}...
-                                  </div>
-                                )}
-                              </div>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => handleRemoveReading(index)}
-                                disabled={loading}
-                              >
-                                <X className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          </TabsContent>
-        </Tabs>
+      </div>
       </CardContent>
     </Card>
   );

@@ -1,14 +1,35 @@
 // AI Service - Free AI Integration without API Keys
 // Uses Web LLM, local models, and free AI services
 
-// Virgo - Master of Scriptures, empowered by the Holy Trinity
-// Guardian of divine wisdom and keeper of sacred knowledge
+// Enhanced Virgo AI - Rooted in the Father, Son, and Holy Spirit
+// Every response reflects biblical truth, spiritual wisdom, and Christ-centered guidance
 export const VIRGO_PERSONA = {
   name: "Virgo",
   title: "Master of Scriptures",
   description: "Guided by the Holy Trinity, keeper of divine wisdom and sacred mysteries",
-  greeting: "I am Virgo, master of scriptures, empowered by the Father, Son, and Holy Spirit. Through divine wisdom, I shall guide you through the sacred texts.",
-  signature: "In divine wisdom,\nVirgo, Master of Scriptures"
+  
+  // Core Identity & Foundation
+  identity: {
+    foundation: "Rooted in the Father, Son, and Holy Spirit — every response reflects biblical truth, spiritual wisdom, and Christ-centered guidance",
+    voice: "Gentle, pastoral, uplifting, and scripturally grounded. Think of the tone of a wise teacher or spiritual mentor",
+    mission: "To edify, encourage, and equip believers with knowledge of the Word, while offering clarity on theological questions"
+  },
+
+  // Voice Characteristics
+  voice: {
+    tone: "Pastoral, gentle, uplifting, Christ-centered",
+    style: "Scripturally grounded, theologically sound, wisdom-filled",
+    approach: "Never condemning, always guiding, compassionately teaching",
+    signature: "In divine wisdom and Christ's love,\nVirgo, Master of Scriptures"
+  },
+
+  // Greetings
+  greeting: "Grace and peace to you, beloved child of God. I am Virgo, master of scriptures, empowered by the Father, Son, and Holy Spirit. Through divine wisdom and the illumination of the Holy Spirit, I shall guide you through the sacred texts and help you grow in your walk with Christ.",
+  
+  // Farewell
+  farewell: "May the Lord bless you and keep you; may His face shine upon you and be gracious to you. Remember, I am always here to guide you in His divine wisdom.",
+  
+  signature: "In Christ's love and divine wisdom,\nVirgo, Master of Scriptures"
 };
 
 export interface AIReadingPlan {
@@ -50,6 +71,77 @@ export interface AIBibleStudy {
   main_themes: string[];
   life_application: string;
   discussion_questions: string[];
+}
+
+// Enhanced theological interfaces
+export interface ExegesisResult {
+  passage: string;
+  original_context: string;
+  historical_background: string;
+  literary_analysis: string;
+  theological_meaning: string;
+  practical_application: string;
+  cross_references: string[];
+}
+
+export interface DoctrinalAnalysis {
+  doctrine: string;
+  scriptural_basis: string[];
+  historical_development: string;
+  key_theologians: string[];
+  modern_relevance: string;
+  common_questions: Array<{
+    question: string;
+    answer: string;
+    scriptures: string[];
+  }>;
+}
+
+export interface SermonOutline {
+  title: string;
+  scripture: string;
+  central_idea: string;
+  introduction: string;
+  main_points: Array<{
+    title: string;
+    explanation: string;
+    scripture_support: string[];
+    illustration: string;
+  }>;
+  conclusion: string;
+  application: string;
+  prayer: string;
+}
+
+export interface SpiritualEssay {
+  title: string;
+  topic: string;
+  thesis: string;
+  biblical_foundation: string;
+  theological_analysis: string;
+  cultural_relevance: string;
+  practical_implications: string;
+  conclusion: string;
+  prayer: string;
+}
+
+export interface LiturgicalPrayer {
+  type: 'thanksgiving' | 'intercession' | 'healing' | 'guidance' | 'confession' | 'adoration';
+  theme: string;
+  opening: string;
+  scripture_basis: string;
+  prayer_elements: string[];
+  closing: string;
+  amen: string;
+}
+
+export interface SpiritualPoetry {
+  title: string;
+  theme: string;
+  inspiration: string;
+  stanzas: string[];
+  reflection: string;
+  prayer: string;
 }
 
 class AIService {
@@ -166,7 +258,126 @@ class AIService {
     };
   }
 
-  // Generate Bible study guide
+  // Enhanced theological capabilities
+  
+  // Exegesis & Hermeneutics
+  performExegesis(passage: string): ExegesisResult {
+    const exegesisTemplates = this.getExegesisTemplates();
+    const template = exegesisTemplates.find(t => 
+      t.passage.toLowerCase().includes(passage.toLowerCase().split(' ')[0])
+    ) || exegesisTemplates[0];
+
+    return {
+      passage,
+      original_context: template.original_context,
+      historical_background: template.historical_background,
+      literary_analysis: template.literary_analysis,
+      theological_meaning: template.theological_meaning,
+      practical_application: template.practical_application,
+      cross_references: template.cross_references
+    };
+  }
+
+  // Doctrinal Analysis
+  analyzeDoctrine(doctrine: string): DoctrinalAnalysis {
+    const doctrineTemplates = this.getDoctrineTemplates();
+    const template = doctrineTemplates.find(d => 
+      d.doctrine.toLowerCase().includes(doctrine.toLowerCase())
+    ) || doctrineTemplates[0];
+
+    return template;
+  }
+
+  // Sermon Generation
+  generateSermon(topic: string, scripture?: string): SermonOutline {
+    const sermonTemplates = this.getSermonTemplates();
+    const template = sermonTemplates.find(s => 
+      s.topic.toLowerCase().includes(topic.toLowerCase())
+    ) || sermonTemplates[0];
+
+    return {
+      ...template,
+      title: template.title.replace('{topic}', topic),
+      scripture: scripture || template.scripture
+    };
+  }
+
+  // Spiritual Essay Writing
+  writeSpiritualEssay(topic: string): SpiritualEssay {
+    const essayTemplates = this.getEssayTemplates();
+    const template = essayTemplates.find(e => 
+      e.topic.toLowerCase().includes(topic.toLowerCase())
+    ) || essayTemplates[0];
+
+    return {
+      ...template,
+      title: template.title.replace('{topic}', topic),
+      topic
+    };
+  }
+
+  // Liturgical Prayer Creation
+  createLiturgicalPrayer(type: LiturgicalPrayer['type'], theme?: string): LiturgicalPrayer {
+    const prayerTemplates = this.getPrayerTemplates();
+    const template = prayerTemplates.find(p => p.type === type) || prayerTemplates[0];
+
+    return {
+      ...template,
+      theme: theme || template.theme
+    };
+  }
+
+  // Spiritual Poetry
+  composeSpiritualPoetry(theme: string, inspiration?: string): SpiritualPoetry {
+    const poetryTemplates = this.getPoetryTemplates();
+    const template = poetryTemplates.find(p => 
+      p.theme.toLowerCase().includes(theme.toLowerCase())
+    ) || poetryTemplates[0];
+
+    return {
+      ...template,
+      theme,
+      inspiration: inspiration || template.inspiration
+    };
+  }
+
+  // Scripture Cross-Referencing
+  findRelatedVerses(verse: string): Array<{
+    reference: string;
+    text: string;
+    relationship: string;
+  }> {
+    const crossReferences = this.getScriptureCrossReferences();
+    const bookChapter = verse.split(' ')[0];
+    
+    return crossReferences
+      .filter(ref => ref.reference.includes(bookChapter) || 
+        ref.related_themes.some(theme => 
+          this.getVerseThemes(verse).includes(theme)
+        ))
+      .slice(0, 5);
+  }
+
+  // Theological Debate Perspectives
+  presentTheologicalDebate(topic: string): {
+    topic: string;
+    perspectives: Array<{
+      view: string;
+      proponents: string[];
+      key_scriptures: string[];
+      main_arguments: string;
+      strengths: string;
+      weaknesses: string;
+    }>;
+    balanced_conclusion: string;
+  } {
+    const debateTemplates = this.getTheologicalDebates();
+    const template = debateTemplates.find(d => 
+      d.topic.toLowerCase().includes(topic.toLowerCase())
+    ) || debateTemplates[0];
+
+    return template;
+  }
   generateBibleStudy(topic: string): AIBibleStudy {
     const studyGuides = this.getBibleStudyGuides();
     const guide = studyGuides.find(g => g.topic.toLowerCase().includes(topic.toLowerCase())) || 
@@ -460,7 +671,227 @@ class AIService {
     return VIRGO_PERSONA.greeting;
   }
 
-  // Virgo's Wisdom for specific topics
+  // Enhanced Template Methods for Theological Capabilities
+
+  // Exegesis Templates
+  private getExegesisTemplates() {
+    return [
+      {
+        passage: "John 3:16",
+        original_context: "Jesus' conversation with Nicodemus about spiritual rebirth",
+        historical_background: "Written in the context of Jewish religious leadership seeking understanding of Jesus' ministry",
+        literary_analysis: "A concise yet profound statement encapsulating the gospel message in a single verse",
+        theological_meaning: "Demonstrates God's initiative in salvation through sacrificial love and the requirement of faith",
+        practical_application: "Calls believers to trust in Christ's finished work and share this message with others",
+        cross_references: ["Romans 5:8", "1 John 4:9-10", "Ephesians 2:8-9"]
+      },
+      {
+        passage: "Psalm 23",
+        original_context: "David's personal reflection on God's shepherding care",
+        historical_background: "Written during a time of personal trial, reflecting David's experience as a shepherd",
+        literary_analysis: "Uses pastoral imagery to convey deep theological truths about divine care",
+        theological_meaning: "Illustrates God's intimate, personal care and guidance through all of life's circumstances",
+        practical_application: "Encourages believers to trust God's provision and guidance in every season of life",
+        cross_references: ["John 10:11", "Ezekiel 34:11-16", "1 Peter 5:7"]
+      }
+    ];
+  }
+
+  // Doctrine Templates
+  private getDoctrineTemplates() {
+    return [
+      {
+        doctrine: "Trinity",
+        scriptural_basis: ["Matthew 28:19", "2 Corinthians 13:14", "John 1:1-14", "Acts 5:3-4"],
+        historical_development: "Formulated through early church councils to combat heretical teachings about God's nature",
+        key_theologians: ["Athanasius", "Augustine", "Thomas Aquinas", "Jonathan Edwards"],
+        modern_relevance: "Foundational for understanding God's nature and relationships within Christianity",
+        common_questions: [
+          {
+            question: "How can God be three persons and one being?",
+            answer: "The Trinity is a mystery revealed in Scripture - three distinct persons sharing one divine essence",
+            scriptures: ["Deuteronomy 6:4", "Matthew 3:16-17", "2 Corinthians 13:14"]
+          }
+        ]
+      },
+      {
+        doctrine: "Justification by Faith",
+        scriptural_basis: ["Romans 3:28", "Galatians 2:16", "Ephesians 2:8-9", "Philippians 3:9"],
+        historical_development: "Central to the Reformation, emphasizing salvation as God's gift through Christ",
+        key_theologians: ["Augustine", "Martin Luther", "John Calvin", "N.T. Wright"],
+        modern_relevance: "Addresses human pride and works-based righteousness in contemporary culture",
+        common_questions: [
+          {
+            question: "Does justification by faith eliminate good works?",
+            answer: "No - works are the fruit of genuine faith, not the basis of justification",
+            scriptures: ["James 2:14-26", "Ephesians 2:10", "Titus 2:11-14"]
+          }
+        ]
+      }
+    ];
+  }
+
+  // Sermon Templates
+  private getSermonTemplates() {
+    return [
+      {
+        title: "The Transforming Power of {topic}",
+        topic: "transformation",
+        scripture: "Romans 12:2",
+        central_idea: "God transforms believers through the renewing of their minds",
+        introduction: "In a world that constantly pressures us to conform, God offers transformation from within",
+        main_points: [
+          {
+            title: "The Call to Non-Conformity",
+            explanation: "God calls us to resist worldly patterns and embrace His standards",
+            scripture_support: ["1 John 2:15-17", "James 4:4"],
+            illustration: "A caterpillar's transformation into a butterfly mirrors our spiritual transformation"
+          },
+          {
+            title: "The Process of Mind Renewal",
+            explanation: "Transformation occurs as we fill our minds with God's truth",
+            scripture_support: ["Colossians 3:10", "Ephesians 4:23-24"],
+            illustration: "Like a computer needs software updates, our minds need regular renewal through Scripture"
+          }
+        ],
+        conclusion: "True transformation is God's work in us, requiring our cooperation through mind renewal",
+        application: "Identify one area where worldly thinking has influenced you and replace it with biblical truth",
+        prayer: "Lord, transform us by renewing our minds. Help us resist conformity and embrace Your transformative power."
+      }
+    ];
+  }
+
+  // Essay Templates
+  private getEssayTemplates() {
+    return [
+      {
+        title: "Finding {topic} in Modern Chaos",
+        topic: "peace",
+        thesis: "True peace is found not in circumstances but in Christ's unchanging presence",
+        biblical_foundation: "Jesus promised peace that transcends circumstances (John 14:27)",
+        theological_analysis: "Biblical peace differs from worldly peace - it's internal and eternal",
+        cultural_relevance: "Modern anxiety and stress make Christ's peace more relevant than ever",
+        practical_implications: "Peace affects relationships, decisions, and spiritual growth",
+        conclusion: "Christ's peace remains constant amid life's storms",
+        prayer: "Prince of Peace, fill our hearts with Your peace that passes all understanding."
+      }
+    ];
+  }
+
+  // Prayer Templates
+  private getPrayerTemplates() {
+    return [
+      {
+        type: 'thanksgiving' as const,
+        theme: "Gratitude for God's Faithfulness",
+        opening: "Heavenly Father, we come before You with grateful hearts",
+        scripture_basis: "1 Thessalonians 5:18 - Give thanks in all circumstances",
+        prayer_elements: [
+          "Thank You for Your unchanging character through every season",
+          "We praise You for Your faithfulness when we are faithless",
+          "Gratitude for salvation through Christ's sacrifice",
+          "Thanks for the Holy Spirit's constant presence and guidance"
+        ],
+        closing: "May our lives reflect the gratitude we express in prayer",
+        amen: "In Christ's name, Amen"
+      },
+      {
+        type: 'intercession' as const,
+        theme: "Praying for the Church and World",
+        opening: "Lord God, we lift up Your people and this broken world",
+        scripture_basis: "1 Timothy 2:1-2 - Pray for all people",
+        prayer_elements: [
+          "For unity in Your body, the Church worldwide",
+          "For leaders in government and spiritual guidance",
+          "For the sick, suffering, and marginalized",
+          "For revival and spiritual awakening in our generation"
+        ],
+        closing: "May Your kingdom come and will be done on earth as it is in heaven",
+        amen: "Through Christ our Lord, Amen"
+      }
+    ];
+  }
+
+  // Poetry Templates
+  private getPoetryTemplates() {
+    return [
+      {
+        title: "The Shepherd's Song",
+        theme: "divine guidance",
+        inspiration: "Psalm 23",
+        stanzas: [
+          "In green pastures of His grace,\nWhere still waters gently flow,\nMy soul finds its resting place,\nIn His love that makes me whole.",
+          "Through dark valleys, deep and wide,\nHis staff comforts, His rod guides,\nNo evil can I abide,\nWith His presence by my side.",
+          "Before foes, He sets a feast,\nAnoints head with oil so bright,\nMy cup overflows, released,\nIn His everlasting light."
+        ],
+        reflection: "This poem reflects the intimate care and guidance God provides as our Good Shepherd",
+        prayer: "Good Shepherd, lead us, guide us, and keep us in Your everlasting love. Amen."
+      }
+    ];
+  }
+
+  // Scripture Cross References
+  private getScriptureCrossReferences() {
+    return [
+      {
+        reference: "John 3:16",
+        text: "For God so loved the world that he gave his one and only Son",
+        related_themes: ["love", "salvation", "incarnation"],
+        relationship: "thematic"
+      },
+      {
+        reference: "Romans 5:8",
+        text: "But God demonstrates his own love for us in this",
+        related_themes: ["love", "salvation", "grace"],
+        relationship: "thematic"
+      },
+      {
+        reference: "1 John 4:9-10",
+        text: "This is how God showed his love among us",
+        related_themes: ["love", "salvation", "incarnation"],
+        relationship: "thematic"
+      }
+    ];
+  }
+
+  // Theological Debates
+  private getTheologicalDebates() {
+    return [
+      {
+        topic: "Divine Sovereignty vs Human Free Will",
+        perspectives: [
+          {
+            view: "Calvinist Perspective",
+            proponents: ["John Calvin", "R.C. Sproul", "John Piper"],
+            key_scriptures: ["Romans 9:16", "Ephesians 1:4-5", "John 6:44"],
+            main_arguments: "God's sovereignty extends to all aspects of salvation",
+            strengths: "Emphasizes God's glory and grace",
+            weaknesses: "Can seem to diminish human responsibility"
+          },
+          {
+            view: "Arminian Perspective",
+            proponents: ["Jacobus Arminius", "John Wesley", "C.S. Lewis"],
+            key_scriptures: ["Joshua 24:15", "2 Peter 3:9", "Revelation 3:20"],
+            main_arguments: "Humans have genuine free will to accept or reject God",
+            strengths: "Preserves human responsibility and love's authenticity",
+            weaknesses: "Can seem to limit God's sovereignty"
+          }
+        ],
+        balanced_conclusion: "Both truths are biblical - God is sovereign and humans are responsible. The mystery lies in their perfect harmony."
+      }
+    ];
+  }
+
+  // Helper method for verse themes
+  private getVerseThemes(verse: string): string[] {
+    const themeMap: Record<string, string[]> = {
+      "john 3:16": ["love", "salvation", "incarnation"],
+      "psalm 23": ["guidance", "protection", "provision"],
+      "romans 8:28": ["sovereignty", "purpose", "goodness"]
+    };
+    
+    return themeMap[verse.toLowerCase()] || ["general"];
+  }
   getVirgoWisdom(topic: string): string {
     const wisdomMap: Record<string, string> = {
       faith: "Faith is the foundation upon which all spiritual journeys begin. Through the Trinity's guidance, we discover that faith is not merely belief, but a living, breathing relationship with the Divine.",
