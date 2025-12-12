@@ -57,8 +57,9 @@ export function GamifiedReadingPlanCard({
   className
 }: GamifiedReadingPlanCardProps) {
   const progressPercentage = plan.progress || 0
-  const isStarted = !!plan.userPlan
-  const isCompleted = !!plan.userPlan?.completed_at
+  const status = plan.status || 'not_started'
+  const isStarted = status !== 'not_started'
+  const isCompleted = status === 'completed'
   const currentDay = plan.userPlan?.current_day || 1
 
   const getDifficultyColor = (difficulty: string) => {
@@ -67,6 +68,24 @@ export function GamifiedReadingPlanCard({
       case 'intermediate': return 'bg-yellow-100 text-yellow-800 border-yellow-200'
       case 'advanced': return 'bg-red-100 text-red-800 border-red-200'
       default: return 'bg-gray-100 text-gray-800 border-gray-200'
+    }
+  }
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'not_started': return 'bg-gray-100 text-gray-800 border-gray-200'
+      case 'in_progress': return 'bg-blue-100 text-blue-800 border-blue-200'
+      case 'completed': return 'bg-green-100 text-green-800 border-green-200'
+      default: return 'bg-gray-100 text-gray-800 border-gray-200'
+    }
+  }
+
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case 'not_started': return 'Not Started'
+      case 'in_progress': return 'In Progress'
+      case 'completed': return 'Completed'
+      default: return 'Not Started'
     }
   }
 
@@ -129,6 +148,9 @@ export function GamifiedReadingPlanCard({
             <div className="flex items-center gap-2 mb-2">
               <Badge className={getDifficultyColor(plan.difficulty)}>
                 {plan.difficulty}
+              </Badge>
+              <Badge className={getStatusColor(status)}>
+                {getStatusText(status)}
               </Badge>
               <div className="flex items-center text-sm text-muted-foreground">
                 <Clock className="h-3 w-3 mr-1" />
@@ -199,6 +221,9 @@ export function GamifiedReadingPlanCard({
         <div className="flex flex-wrap items-center gap-2">
           <Badge className={getDifficultyColor(plan.difficulty)}>
             {plan.difficulty}
+          </Badge>
+          <Badge className={getStatusColor(status)}>
+            {getStatusText(status)}
           </Badge>
           <div className="flex items-center text-sm text-muted-foreground">
             <Calendar className="h-3 w-3 mr-1" />

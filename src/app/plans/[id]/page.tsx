@@ -80,13 +80,31 @@ export default function PlanDetailPage() {
     
     try {
       setStartingPlan(true)
-      const newUserPlan = await readingPlanService.startReadingPlan(user.id, plan.id)
+      const newUserPlan = await readingPlanService.startReadingPlan(user.id, plan.id, plan.duration)
       setUserPlan(newUserPlan)
     } catch (error) {
       console.error('Error starting plan:', error)
       // You could show a toast notification here
     } finally {
       setStartingPlan(false)
+    }
+  }
+
+  const completeCurrentDay = async () => {
+    if (!user || !userPlan) return
+    
+    try {
+      await readingPlanService.completeDay(user.id, plan.id, userPlan.current_day)
+      
+      // Refresh progress data
+      const progressData = await readingPlanService.getReadingPlanProgress(user.id, plan.id)
+      setProgressData(progressData)
+      
+      // Refresh user plan data
+      const updatedUserPlan = await readingPlanService.getUserReadingPlan(user.id, plan.id)
+      setUserPlan(updatedUserPlan)
+    } catch (error) {
+      console.error('Error completing day:', error)
     }
   }
 
@@ -214,7 +232,7 @@ export default function PlanDetailPage() {
                 </Button>
               )}
               {userPlan && !isCompleted && (
-                <Button variant="outline" size="lg">
+                <Button variant="outline" size="lg" onClick={completeCurrentDay}>
                   <CheckCircle className="mr-2 h-4 w-4" />
                   Mark Complete
                 </Button>

@@ -38,6 +38,22 @@ export default function ReadingPlansPage() {
       if (user) {
         const userPlansData = await readingPlanService.getUserReadingPlans(user.id);
         setUserPlans(userPlansData || []);
+
+        // Fetch enhanced status for each user plan
+        const enhancedUserPlans = await Promise.all(
+          userPlansData.map(async (plan) => {
+            const status = await readingPlanService.getReadingPlanStatus(user.id, plan.id);
+            return {
+              ...plan,
+              status: status.status,
+              progress: status.progressPercentage,
+              currentDay: status.currentDay,
+              streak: status.streak,
+              completedDays: status.completedDays
+            };
+          })
+        );
+        setUserPlans(enhancedUserPlans);
       }
     } catch (error) {
       console.error('Error fetching reading plans:', error);

@@ -50,6 +50,17 @@ export interface ReadingPlanProgress {
   updated_at: string;
 }
 
+export interface ReadingPlanStreak {
+  id: string;
+  user_id: string;
+  plan_id: string;
+  current_streak: number;
+  longest_streak: number;
+  last_completed_date?: string;
+  created_at: string;
+  updated_at: string;
+}
+
 class ReadingPlanService {
   // Get all public reading plans
   async getPublicReadingPlans(): Promise<ReadingPlan[]> {
@@ -196,7 +207,7 @@ class ReadingPlanService {
         .select('*')
         .eq('user_id', userId)
         .eq('plan_id', planId)
-        .order('day_number', { ascending: true });
+        .order('day', { ascending: true });
 
       if (error) throw error;
       return data || [];
@@ -357,6 +368,210 @@ class ReadingPlanService {
     } catch (error) {
       console.error('Error creating reading plan:', error);
       throw error;
+    }
+  }
+
+  // Enhanced functions for progressive reading plan management
+
+  // Start a reading plan with proper status management
+  async startReadingPlan(userId: string, planId: string, totalDays: number): Promise<UserReadingPlan> {
+    try {
+      const { data, error } = await supabase
+        .from('user_reading_plans')
+        .upsert([{
+          user_id: userId,
+          plan_id: planId,
+          status: 'in_progress',
+          started_at: new Date().toISOString(),
+          current_day: 1,
+          total_days: totalDays
+        }])
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error('Error starting reading plan:', error);
+      throw error;
+    }
+  }
+
+  // Complete a specific day and update progress
+  async completeDay(userId: string, planId: string, day: number, notes?: string): Promise<ReadingPlanProgress> {
+    try {
+      const { data, error } = await supabase
+        .from('reading_plan_progress')
+        .upsert([{
+          user_id: userId,
+          plan_id: planId,
+          day: day,
+          completed: true,
+          completed_at: new Date().toISOString(),
+          notes: notes,
+          points_earned: 10 // Award points for completing a day
+        }])
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      // Update streak
+      await this.updateStreak(userId, planId);
+
+      // Award points to user
+      await this.awardPoints(userId, 10, `Completed Day ${day} of reading plan`);
+
+      return data;
+    } catch (error) {
+      console.error('Error completing day:', error);
+      throw error;
+    }
+  }
+
+  // Get reading plan progress for a user
+  async getReadingPlanProgress(userId: string, planId: string): Promise<ReadingPlanProgress[]> {
+    try {
+      const { data, error } = await supabase
+        .from('reading_plan_progress')
+        .select('*')
+        .eq('user_id', userId)
+        .eq('plan_id', planId)
+        .order('day', { ascending: true });
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      console.error('Error fetching reading plan progress:', error);
+      return [];
+    }
+  }
+
+  // Get user's reading plan with status
+  async getUserReadingPlan(userId: string, planId: string): Promise<UserReadingPlan | null> {
+    try {
+      const { data, error } = await supabase
+        .from('user_reading_plans')
+        .select('*')
+        .eq('user_id', userId)
+        .eq('plan_id', planId)
+        .single();
+
+      if (error) {
+        if (error.code === 'PGRST116') return null; // No rows found
+        throw error;
+      }
+      return data;
+    } catch (error) {
+      console.error('Error fetching user reading plan:', error);
+      return null;
+    }
+  }
+
+  // Update reading plan streak
+  async updateStreak(userId: string, planId: string): Promise<void> {
+    try {
+      const today = new Date().toISOString().split('T')[0];
+      
+      // Get current streak
+      const { data: currentStreak } = await supabase
+        .from('reading_plan_streaks')
+        .select('*')
+        .eq('user_id', userId)
+        .eq('plan_id', planId)
+        .single();
+
+      let newStreak = 1;
+      let longestStreak = 1;
+
+      if (currentStreak) {
+        const lastCompleted = currentStreak.last_completed_date;
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        const yesterdayStr = yesterday.toISOString().split('T')[0];
+
+        if (lastCompleted === yesterdayStr) {
+          // Continue streak
+          newStreak = currentStreak.current_streak + 1;
+          longestStreak = Math.max(currentStreak.longest_streak, newStreak);
+        } else if (lastCompleted === todayStr) {
+          // Already completed today
+          return;
+        } else {
+          // Reset streak
+          newStreak = 1;
+          longestStreak = currentStreak.longest_streak;
+        }
+      }
+
+      // Update streak
+      await supabase
+        .from('reading_plan_streaks')
+        .upsert([{
+          user_id: userId,
+          plan_id: planId,
+          current_streak: newStreak,
+          longest_streak: longestStreak,
+          last_completed_date: today
+        }]);
+    } catch (error) {
+      console.error('Error updating streak:', error);
+    }
+  }
+
+  // Get reading plan status with progress percentage
+  async getReadingPlanStatus(userId: string, planId: string): Promise<{
+    status: 'not_started' | 'in_progress' | 'completed';
+    currentDay: number;
+    totalDays: number;
+    progressPercentage: number;
+    completedDays: number;
+    streak: number;
+  }> {
+    try {
+      const userPlan = await this.getUserReadingPlan(userId, planId);
+      const progress = await this.getReadingPlanProgress(userId, planId);
+      
+      if (!userPlan) {
+        return {
+          status: 'not_started',
+          currentDay: 1,
+          totalDays: 0,
+          progressPercentage: 0,
+          completedDays: 0,
+          streak: 0
+        };
+      }
+
+      const completedDays = progress.filter(p => p.completed).length;
+      const progressPercentage = userPlan.total_days > 0 ? (completedDays / userPlan.total_days) * 100 : 0;
+
+      // Get streak
+      const { data: streakData } = await supabase
+        .from('reading_plan_streaks')
+        .select('current_streak')
+        .eq('user_id', userId)
+        .eq('plan_id', planId)
+        .single();
+
+      return {
+        status: userPlan.status,
+        currentDay: userPlan.current_day,
+        totalDays: userPlan.total_days,
+        progressPercentage,
+        completedDays,
+        streak: streakData?.current_streak || 0
+      };
+    } catch (error) {
+      console.error('Error getting reading plan status:', error);
+      return {
+        status: 'not_started',
+        currentDay: 1,
+        totalDays: 0,
+        progressPercentage: 0,
+        completedDays: 0,
+        streak: 0
+      };
     }
   }
 }
