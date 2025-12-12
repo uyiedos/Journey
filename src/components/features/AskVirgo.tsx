@@ -46,7 +46,7 @@ I am here to guide you through your spiritual journey and answer your questions 
 
   const questionCategories = [
     { name: 'Journey App', icon: <Users className="h-3 w-3" />, color: 'bg-blue-100 text-blue-800' },
-    { name: 'Bible & Scripture', icon: <BookOpen className="h-3 w-3" />, color: 'bg-purple-100 text-purple-800' },
+    { name: 'Bible & Scripture', icon: <BookOpen className="h-3 w-3" />, color: 'bg-blue-100 text-blue-800' },
     { name: 'Christian Faith', icon: <Cross className="h-3 w-3" />, color: 'bg-green-100 text-green-800' },
     { name: 'Prayer & Devotion', icon: <Heart className="h-3 w-3" />, color: 'bg-red-100 text-red-800' },
     { name: 'Spiritual Growth', icon: <Star className="h-3 w-3" />, color: 'bg-yellow-100 text-yellow-800' },
@@ -285,12 +285,12 @@ Finding a healthy church community is vital for your spiritual journey. ${VIRGO_
                   <div
                     className={`max-w-[80%] rounded-lg p-3 ${
                       message.type === 'user'
-                        ? 'bg-purple-600 text-white'
-                        : 'bg-muted border-2 border-purple-200'
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-muted border-2 border-blue-200'
                     }`}
                   >
                     <div className="flex items-center gap-2 mb-1">
-                      {message.type === 'virgo' && <Star className="h-4 w-4 text-purple-600" />}
+                      {message.type === 'virgo' && <Star className="h-4 w-4 text-blue-600" />}
                       <span className="text-xs font-medium">
                         {message.type === 'virgo' ? 'Virgo' : 'You'}
                       </span>
@@ -346,7 +346,7 @@ Finding a healthy church community is vital for your spiritual journey. ${VIRGO_
                 <Badge
                   key={question}
                   variant="outline"
-                  className="cursor-pointer hover:bg-purple-50 hover:border-purple-600"
+                  className="cursor-pointer hover:bg-blue-50 hover:border-blue-600"
                   onClick={() => handleQuestionClick(question)}
                 >
                   {question}
@@ -367,7 +367,7 @@ Finding a healthy church community is vital for your spiritual journey. ${VIRGO_
             <Button
               onClick={handleSendMessage}
               disabled={!input.trim() || isTyping}
-              className="bg-purple-600 hover:bg-purple-700"
+              className="bg-blue-600 hover:bg-blue-700"
             >
               {isTyping ? (
                 <Loader2 className="h-4 w-4 animate-spin" />

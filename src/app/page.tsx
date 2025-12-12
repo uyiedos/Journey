@@ -178,6 +178,11 @@ export default function Home() {
           </section>
         )}
 
+        {/* Verse of the Day */}
+        <section className="space-y-4">
+          <VerseOfTheDay />
+        </section>
+
         {/* Latest Devotionals */}
         <section className="space-y-4">
           <div className="flex items-center justify-between">

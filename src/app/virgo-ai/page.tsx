@@ -53,7 +53,7 @@ export default function VirgoAIPage() {
           <div className="flex items-center justify-center gap-3">
             <Sparkles className="h-8 w-8 text-purple-600" />
             <Cross className="h-6 w-6 text-blue-600" />
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+            <h1 className="text-4xl font-bold bg-linear-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
               Virgo AI
             </h1>
             <Cross className="h-6 w-6 text-blue-600" />
@@ -84,14 +84,14 @@ export default function VirgoAIPage() {
             
             <div className="grid gap-4">
               {virgoPlans.map((plan: any) => (
-                <Card key={plan.id} className="border-2 border-purple-200 bg-purple-50 dark:border-purple-800 dark:bg-purple-950">
+                <Card key={plan.id} className="border-2 border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950">
                   <CardHeader>
                     <CardTitle className="flex items-center justify-between">
                       <span className="flex items-center gap-2">
-                        <Star className="h-5 w-5 text-purple-600" />
+                        <Star className="h-5 w-5 text-blue-600" />
                         {plan.reading_plans?.title || 'Untitled Plan'}
                       </span>
-                      <Badge variant="outline" className="border-purple-600 text-purple-600">
+                      <Badge variant="outline" className="border-blue-600 text-blue-600">
                         {plan.reading_plans?.difficulty || 'beginner'}
                       </Badge>
                     </CardTitle>
@@ -125,7 +125,7 @@ export default function VirgoAIPage() {
         )}
 
         {/* Virgo's Capabilities */}
-        <Card className="border-2 bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-950 dark:to-blue-950">
+        <Card className="border-2 bg-linear-to-br from-purple-50 to-blue-50 dark:from-purple-950 dark:to-blue-950">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Heart className="h-5 w-5 text-purple-600" />

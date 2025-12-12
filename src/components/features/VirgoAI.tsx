@@ -214,7 +214,7 @@ ${aiService.getVirgoWisdom(userMessage)}`;
             I am here to help you grow in faith and understanding of God's Word."
           </p>
           {virgoMessage && (
-            <Alert className="mt-4 border-purple-200 bg-purple-50 dark:border-purple-800 dark:bg-purple-950">
+            <Alert className="mt-4 border-gray-200 bg-gray-50 dark:border-gray-800 dark:bg-gray-950">
               <Sparkles className="h-4 w-4" />
               <AlertDescription className="italic">
                 {virgoMessage}
@@ -247,7 +247,7 @@ ${aiService.getVirgoWisdom(userMessage)}`;
                     <div className={`inline-block max-w-xs px-4 py-2 rounded-lg ${
                       entry.role === 'user' 
                         ? 'bg-blue-500 text-white' 
-                        : 'bg-purple-100 text-purple-900 dark:bg-purple-900 dark:text-purple-100'
+                        : 'bg-blue-100 text-blue-900 dark:bg-blue-900 dark:text-blue-100'
                     }`}>
                       <p className="text-sm">{entry.message}</p>
                       <p className="text-xs opacity-75 mt-1">
@@ -272,7 +272,7 @@ ${aiService.getVirgoWisdom(userMessage)}`;
               <Button 
                 onClick={handleDivineConversation}
                 disabled={!userMessage.trim() || isCreating}
-                className="bg-purple-600 hover:bg-purple-700"
+                className="bg-blue-600 hover:bg-blue-700"
               >
                 {isCreating ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -317,7 +317,7 @@ ${aiService.getVirgoWisdom(userMessage)}`;
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="border-2"
               />
-              <Button onClick={handleScriptureSearch} className="bg-purple-600 hover:bg-purple-700">
+              <Button onClick={handleScriptureSearch} className="bg-blue-600 hover:bg-blue-700">
                 <Search className="h-4 w-4" />
               </Button>
             </div>
@@ -327,7 +327,7 @@ ${aiService.getVirgoWisdom(userMessage)}`;
                 <h3 className="font-semibold">Relevant Scriptures:</h3>
                 {searchResults.map((result, index) => (
                   <div key={index} className="border rounded-lg p-3 bg-gray-50 dark:bg-gray-900">
-                    <h4 className="font-medium text-purple-700 dark:text-purple-300">
+                    <h4 className="font-medium text-blue-700 dark:text-blue-300">
                       {result.situation || `Psalm ${result.number}: ${result.title}`}
                     </h4>
                     <p className="text-sm text-muted-foreground mt-1">
@@ -363,7 +363,7 @@ ${aiService.getVirgoWisdom(userMessage)}`;
                 onChange={(e) => setPsalmNumber(e.target.value)}
                 className="border-2"
               />
-              <Button onClick={handlePsalmLookup} className="bg-purple-600 hover:bg-purple-700">
+              <Button onClick={handlePsalmLookup} className="bg-blue-600 hover:bg-blue-700">
                 <Book className="h-4 w-4" />
               </Button>
             </div>
@@ -387,8 +387,8 @@ ${aiService.getVirgoWisdom(userMessage)}`;
             </div>
 
             {searchResults.length > 0 && searchResults[0].number && (
-              <div className="border rounded-lg p-4 bg-purple-50 dark:bg-purple-950">
-                <h3 className="font-semibold text-purple-700 dark:text-purple-300">
+              <div className="border rounded-lg p-4 bg-gray-50 dark:bg-gray-950">
+                <h3 className="font-semibold text-blue-700 dark:text-blue-300">
                   Psalm {searchResults[0].number}: {searchResults[0].title}
                 </h3>
                 <p className="text-sm mt-2">{searchResults[0].description}</p>
@@ -415,7 +415,7 @@ ${aiService.getVirgoWisdom(userMessage)}`;
                 onChange={(e) => setPrayerPerson(e.target.value)}
                 className="border-2"
               />
-              <Button onClick={handlePrayerLookup} className="bg-purple-600 hover:bg-purple-700">
+              <Button onClick={handlePrayerLookup} className="bg-blue-600 hover:bg-blue-700">
                 <Heart className="h-4 w-4" />
               </Button>
             </div>
