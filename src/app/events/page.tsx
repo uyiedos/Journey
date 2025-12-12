@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { Layout } from '@/components/layout/Layout';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -13,11 +13,13 @@ import { events as initialEvents } from '@/data/events';
 import { Event } from '@/types';
 import { useAuth } from '@/contexts/SupabaseAuthContext';
 import { supabaseService } from '@/services/supabaseService';
+import { EventService } from '@/services/eventService';
 import { Video, Calendar, Clock, Heart, MessageCircle } from 'lucide-react';
 
 const EventsPage: React.FC = () => {
   const { user: authUser } = useAuth();
-  const [allEvents, setAllEvents] = useState<Event[]>(initialEvents);
+  const [allEvents, setAllEvents] = useState<Event[]>([]);
+  const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'all' | 'ongoing' | 'upcoming' | 'past'>('all');
   const [newEvent, setNewEvent] = useState({
     title: '',
@@ -31,6 +33,23 @@ const EventsPage: React.FC = () => {
   const [comments, setComments] = useState<Record<string, { id: string; user: string; content: string; createdAt: string }[]>>({});
   const [newComment, setNewComment] = useState<Record<string, string>>({});
   const [showForm, setShowForm] = useState(false);
+
+  // Fetch events from Supabase on component mount
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const events = await EventService.getAllEvents();
+        setAllEvents(events.length > 0 ? events : initialEvents);
+      } catch (error) {
+        console.error('Error fetching events:', error);
+        setAllEvents(initialEvents);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchEvents();
+  }, []);
 
   const classifyEvents = useMemo(() => {
     const now = new Date();
@@ -101,28 +120,30 @@ const EventsPage: React.FC = () => {
   const handleCreateEvent = async () => {
     if (!authUser || !newEvent.title.trim() || !newEvent.videoUrl.trim() || !newEvent.startsAt.trim()) return;
 
-    const event: Event = {
-      id: `event-${Date.now()}`,
-      title: newEvent.title.trim(),
-      description: newEvent.description.trim(),
-      type: 'video',
-      videoUrl: newEvent.videoUrl.trim(),
-      startsAt: new Date(newEvent.startsAt).toISOString(),
-      endsAt: newEvent.endsAt.trim() ? new Date(newEvent.endsAt).toISOString() : undefined,
-      createdAt: new Date().toISOString(),
-      tags: newEvent.tags
-        .split(',')
-        .map((t) => t.trim())
-        .filter(Boolean),
-    };
-
-    setAllEvents((prev) => [event, ...prev]);
-    setNewEvent({ title: '', description: '', videoUrl: '', startsAt: '', endsAt: '', tags: '' });
-
     try {
+      // Create event in Supabase
+      const createdEvent = await EventService.createEvent(authUser.id, {
+        title: newEvent.title.trim(),
+        description: newEvent.description.trim(),
+        type: 'video',
+        videoUrl: newEvent.videoUrl.trim(),
+        startsAt: new Date(newEvent.startsAt).toISOString(),
+        endsAt: newEvent.endsAt.trim() ? new Date(newEvent.endsAt).toISOString() : undefined,
+        tags: newEvent.tags
+          .split(',')
+          .map((t) => t.trim())
+          .filter(Boolean),
+      });
+
+      // Add to local state
+      setAllEvents((prev) => [createdEvent, ...prev]);
+      setNewEvent({ title: '', description: '', videoUrl: '', startsAt: '', endsAt: '', tags: '' });
+
+      // Award points for event creation
       await supabaseService.addPoints(authUser.id, 500);
     } catch (error) {
-      console.error('Error awarding points for event creation:', error);
+      console.error('Error creating event:', error);
+      alert('Failed to create event. Please try again.');
     }
   };
 

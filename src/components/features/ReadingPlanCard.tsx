@@ -30,8 +30,8 @@ export function ReadingPlanCard({ plan, userProgress = 0 }: ReadingPlanCardProps
       setIsStarting(true);
       await readingPlanService.startReadingPlan(user.id, plan.id);
       setHasStarted(true);
-      // Optionally redirect to the plan page
-      window.location.href = `/plans/${plan.id}`;
+      // Optionally redirect to the plans page
+      window.location.href = `/plans`;
     } catch (error) {
       console.error('Error starting reading plan:', error);
       // You could show a toast notification here
@@ -125,7 +125,7 @@ export function ReadingPlanCard({ plan, userProgress = 0 }: ReadingPlanCardProps
             ) : (
               <>
                 <Clock className="mr-1 h-3 w-3" />
-                Not started
+                Plan
               </>
             )}
           </Badge>
@@ -138,7 +138,7 @@ export function ReadingPlanCard({ plan, userProgress = 0 }: ReadingPlanCardProps
           disabled={isStarting || !user}
         >
           {hasStarted ? (
-            <Link href={`/plans/${plan.id}`}>
+            <Link href="/plans">
               Continue Plan
             </Link>
           ) : (
@@ -146,10 +146,12 @@ export function ReadingPlanCard({ plan, userProgress = 0 }: ReadingPlanCardProps
               {isStarting ? (
                 <span>Starting...</span>
               ) : (
-                <span>
-                  <Play className="mr-2 h-4 w-4" />
-                  Start Plan
-                </span>
+                <Link href="/plans">
+                  <span>
+                    <Play className="mr-2 h-4 w-4" />
+                    Start Plan
+                  </span>
+                </Link>
               )}
             </div>
           )}

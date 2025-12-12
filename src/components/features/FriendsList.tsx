@@ -7,9 +7,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { AuthGuard } from '@/components/auth/AuthGuard';
-import { Users, UserPlus, Search, MessageCircle, Trophy, Flame } from 'lucide-react';
+import { Users, UserPlus, Search, MessageCircle, Trophy, Flame, Check, X } from 'lucide-react';
 import { useAuth } from '@/contexts/SupabaseAuthContext';
 import { supabaseService } from '@/services/supabaseService';
+import { FriendRequestService, FriendRequest } from '@/services/friendRequestService';
 
 interface Friend {
   id: string;
@@ -29,7 +30,7 @@ export function FriendsList() {
   const [showOnlineOnly, setShowOnlineOnly] = useState(false);
   const [activeTab, setActiveTab] = useState<'all' | 'online' | 'requests'>('all');
   const [friends, setFriends] = useState<any[]>([]);
-  const [friendRequests, setFriendRequests] = useState<any[]>([]);
+  const [friendRequests, setFriendRequests] = useState<FriendRequest[]>([]);
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -38,30 +39,48 @@ export function FriendsList() {
     if (!authUser) return;
     
     try {
-      // Fetch accepted friends
-      const { data: friendsData } = await supabaseService.getClient()
-        .from('friends')
-        .select(`
-          *,
-          friend:users(id, username, full_name, avatar_url, points, level, streak)
-        `)
-        .or(`user_id.eq.${authUser.id},friend_id.eq.${authUser.id}`)
-        .eq('status', 'accepted');
-
-      // Fetch friend requests
-      const { data: requestsData } = await supabaseService.getClient()
-        .from('friends')
-        .select(`
-          *,
-          user:users(id, username, full_name, avatar_url, points, level, streak)
-        `)
-        .eq('friend_id', authUser.id)
-        .eq('status', 'pending');
-
-      setFriends(friendsData || []);
-      setFriendRequests(requestsData || []);
+      // Fetch all friends using FriendRequestService
+      const friendsData = await FriendRequestService.getAllFriends(authUser.id);
+      setFriends(friendsData);
+      
+      // Fetch received friend requests
+      const requestsData = await FriendRequestService.getReceivedFriendRequests(authUser.id);
+      setFriendRequests(requestsData);
     } catch (error) {
       console.error('Error fetching friends:', error);
+    }
+  };
+
+  // Accept friend request
+  const handleAcceptRequest = async (requestId: string) => {
+    try {
+      await FriendRequestService.acceptFriendRequest(requestId);
+      await fetchFriends(); // Refresh friends list
+    } catch (error) {
+      console.error('Error accepting friend request:', error);
+    }
+  };
+
+  // Reject friend request
+  const handleRejectRequest = async (requestId: string) => {
+    try {
+      await FriendRequestService.rejectFriendRequest(requestId);
+      await fetchFriends(); // Refresh friends list
+    } catch (error) {
+      console.error('Error rejecting friend request:', error);
+    }
+  };
+
+  // Send friend request
+  const handleSendFriendRequest = async (receiverId: string) => {
+    try {
+      await FriendRequestService.sendFriendRequest(authUser!.id, receiverId);
+      alert('Friend request sent!');
+      setSearchResults([]);
+      setSearchTerm('');
+    } catch (error) {
+      console.error('Error sending friend request:', error);
+      alert('Failed to send friend request');
     }
   };
 
@@ -247,7 +266,7 @@ export function FriendsList() {
                       <div className="text-sm text-muted-foreground">Level {user.level} • {user.points} points</div>
                     </div>
                   </div>
-                  <Button size="sm" onClick={() => sendFriendRequest(user.id)}>
+                  <Button size="sm" onClick={() => handleSendFriendRequest(user.id)}>
                     <UserPlus className="h-4 w-4 mr-1" />
                     Add Friend
                   </Button>
@@ -269,19 +288,20 @@ export function FriendsList() {
               <div key={request.id} className="flex items-center justify-between p-3 border rounded-lg">
                 <div className="flex items-center space-x-3">
                   <Avatar className="h-8 w-8">
-                    <AvatarImage src={request.user?.avatar_url} />
-                    <AvatarFallback>{request.user?.username?.charAt(0) || 'U'}</AvatarFallback>
+                    <AvatarFallback>U</AvatarFallback>
                   </Avatar>
                   <div>
-                    <div className="font-medium">{request.user?.full_name || request.user?.username}</div>
-                    <div className="text-sm text-muted-foreground">Level {request.user?.level} • {request.user?.points} points</div>
+                    <div className="font-medium">Friend Request</div>
+                    <div className="text-sm text-muted-foreground">Someone wants to be your friend</div>
                   </div>
                 </div>
                 <div className="flex gap-2">
-                  <Button size="sm" onClick={() => acceptFriendRequest(request.id)}>
+                  <Button size="sm" onClick={() => handleAcceptRequest(request.id)}>
+                    <Check className="h-4 w-4 mr-1" />
                     Accept
                   </Button>
-                  <Button size="sm" variant="outline">
+                  <Button size="sm" variant="outline" onClick={() => handleRejectRequest(request.id)}>
+                    <X className="h-4 w-4 mr-1" />
                     Decline
                   </Button>
                 </div>

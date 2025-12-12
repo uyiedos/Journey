@@ -15,8 +15,8 @@ import { useAuth } from '@/contexts/SupabaseAuthContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { DevotionalService, Devotional } from '@/services/devotionalService';
 import { getTodaysDevotional, getAllDevotionals } from '@/data/devotionals';
-import { readingPlans, getReadingPlanById } from '@/data/readingPlans';
 import { getLatestEvents } from '@/data/events';
 import { readingPlanService, type ReadingPlan, type UserReadingPlan } from '@/services/readingPlanService';
 import { BookOpen, Users, Heart, Trophy, Star, ArrowRight, Award, Sparkles, Calendar, Video } from 'lucide-react';
@@ -29,33 +29,59 @@ export default function Home() {
   const { user } = useAuth();
   const [dbReadingPlans, setDbReadingPlans] = useState<ReadingPlan[]>([]);
   const [userReadingPlans, setUserReadingPlans] = useState<UserReadingPlan[]>([]);
+  const [dbDevotionals, setDbDevotionals] = useState<Devotional[]>([]);
+  const [dbEvents, setDbEvents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   
-  const todaysDevotional = getTodaysDevotional();
-  const allDevotionals = getAllDevotionals();
-  const latestEvents = getLatestEvents();
-
   useEffect(() => {
-    const fetchReadingPlans = async () => {
+    const fetchData = async () => {
       try {
         setLoading(true);
-        const plans = await readingPlanService.getPublicReadingPlans();
-        setDbReadingPlans(plans);
         
+        // Fetch reading plans
+        console.log('Fetching reading plans from Supabase...');
+        const plans = await readingPlanService.getPublicReadingPlans();
+        console.log('Fetched reading plans:', plans);
+        
+        // If no plans from Supabase, use mock data as fallback
+        if (plans.length === 0) {
+          console.log('No reading plans from Supabase, using mock data fallback');
+          const { readingPlans: mockPlans } = await import('@/data/readingPlans');
+          // Convert mock data to match service types
+          const convertedPlans = mockPlans.map(plan => ({
+            ...plan,
+            readings: plan.readings.map(reading => ({
+              ...reading,
+              devotional: reading.devotional || '' // Ensure devotional is a string
+            }))
+          }));
+          setDbReadingPlans(convertedPlans);
+        } else {
+          setDbReadingPlans(plans);
+        }
+        
+        // Fetch devotionals from Supabase
+        const devotionals = await DevotionalService.getAllDevotionals();
+        setDbDevotionals(devotionals);
+        
+        // Fetch events from Supabase
+        const { EventService } = await import('@/services/eventService');
+        const events = await EventService.getAllEvents();
+        setDbEvents(events);
+        
+        // Fetch user reading plans if logged in
         if (user) {
           const userPlans = await readingPlanService.getUserReadingPlans(user.id);
           setUserReadingPlans(userPlans);
         }
       } catch (error) {
-        console.error('Error fetching reading plans:', error);
-        // Fallback to mock data if database fails
-        setDbReadingPlans(readingPlans.slice(0, 4) as any);
+        console.error('Error fetching data:', error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchReadingPlans();
+    fetchData();
   }, [user]);
 
   return (
@@ -162,17 +188,17 @@ export default function Home() {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {getAllDevotionals().slice(0, 3).map((devotional, index) => (
+            {dbDevotionals.slice(0, 3).map((devotional, index) => (
               <Card key={`devotional-${devotional.id}-${index}`} className="hover:shadow-lg transition-shadow">
                 <CardHeader>
                   <CardTitle className="text-lg">{devotional.title}</CardTitle>
-                  <CardDescription>{devotional.date.toLocaleDateString()}</CardDescription>
+                  <CardDescription>{new Date(devotional.created_at).toLocaleDateString()}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground line-clamp-3">
                     {devotional.content.substring(0, 150)}...
                   </p>
-                  <Link href={`/devotionals/${devotional.id}`}>
+                  <Link href="/devotionals">
                     <Button variant="ghost" size="sm" className="mt-2">
                       Read More
                       <ArrowRight className="ml-2 h-4 w-4" />
@@ -193,9 +219,9 @@ export default function Home() {
             </Link>
           </div>
           
-          {latestEvents.length > 0 && (
+          {dbEvents.length > 0 && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {latestEvents.slice(0, 3).map((event) => (
+              {dbEvents.slice(0, 3).map((event) => (
                 <Card key={event.id} className="hover:shadow-lg transition-shadow">
                   <CardHeader>
                     <CardTitle className="flex items-center justify-between gap-2">
@@ -207,9 +233,9 @@ export default function Home() {
                   <CardContent className="flex items-center justify-between">
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <Calendar className="h-4 w-4" />
-                      <span>{new Date(event.startsAt).toLocaleDateString()}</span>
+                      <span>{new Date(event.startsAt || event.starts_at).toLocaleDateString()}</span>
                     </div>
-                    <Link href={`/events/${event.id}`}>
+                    <Link href="/events">
                       <Button size="sm" className="flex items-center gap-1">
                         Join Event
                         <ArrowRight className="h-4 w-4" />

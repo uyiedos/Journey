@@ -21,9 +21,9 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 -- Run this in Supabase SQL Editor
 
 -- Create likes table
-CREATE TABLE IF NOT EXISTS likes (
+CREATE TABLE IF NOT EXISTS public.likes (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    user_id UUID REFERENCES public.users(id) ON DELETE CASCADE,
     target_id UUID NOT NULL,
     target_type VARCHAR(20) NOT NULL CHECK (target_type IN ('post', 'devotional', 'prayer')),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
@@ -31,9 +31,9 @@ CREATE TABLE IF NOT EXISTS likes (
 );
 
 -- Create comments table
-CREATE TABLE IF NOT EXISTS comments (
+CREATE TABLE IF NOT EXISTS public.comments (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    user_id UUID REFERENCES public.users(id) ON DELETE CASCADE,
     target_id UUID NOT NULL,
     target_type VARCHAR(20) NOT NULL CHECK (target_type IN ('post', 'devotional', 'prayer')),
     content TEXT NOT NULL,
@@ -42,9 +42,9 @@ CREATE TABLE IF NOT EXISTS comments (
 );
 
 -- Create shares table
-CREATE TABLE IF NOT EXISTS shares (
+CREATE TABLE IF NOT EXISTS public.shares (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    user_id UUID REFERENCES public.users(id) ON DELETE CASCADE,
     target_id UUID NOT NULL,
     target_type VARCHAR(20) NOT NULL CHECK (target_type IN ('post', 'devotional', 'prayer')),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
@@ -128,47 +128,47 @@ BEGIN
 END $$;
 
 -- Create indexes for performance
-CREATE INDEX IF NOT EXISTS idx_likes_user_id ON likes(user_id);
-CREATE INDEX IF NOT EXISTS idx_likes_target ON likes(target_id, target_type);
-CREATE INDEX IF NOT EXISTS idx_comments_user_id ON comments(user_id);
-CREATE INDEX IF NOT EXISTS idx_comments_target ON comments(target_id, target_type);
-CREATE INDEX IF NOT EXISTS idx_shares_user_id ON shares(user_id);
-CREATE INDEX IF NOT EXISTS idx_shares_target ON shares(target_id, target_type);
+CREATE INDEX IF NOT EXISTS idx_likes_user_id ON public.likes(user_id);
+CREATE INDEX IF NOT EXISTS idx_likes_target ON public.likes(target_id, target_type);
+CREATE INDEX IF NOT EXISTS idx_comments_user_id ON public.comments(user_id);
+CREATE INDEX IF NOT EXISTS idx_comments_target ON public.comments(target_id, target_type);
+CREATE INDEX IF NOT EXISTS idx_shares_user_id ON public.shares(user_id);
+CREATE INDEX IF NOT EXISTS idx_shares_target ON public.shares(target_id, target_type);
 
 -- Enable RLS
-ALTER TABLE likes ENABLE ROW LEVEL SECURITY;
-ALTER TABLE comments ENABLE ROW LEVEL SECURITY;
-ALTER TABLE shares ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.likes ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.comments ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.shares ENABLE ROW LEVEL SECURITY;
 
 -- Create RLS policies for likes
-DROP POLICY IF EXISTS "Users can view own likes" ON likes;
-CREATE POLICY "Users can view own likes" ON likes FOR SELECT USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can view own likes" ON public.likes;
+CREATE POLICY "Users can view own likes" ON public.likes FOR SELECT USING (auth.uid() = user_id);
 
-DROP POLICY IF EXISTS "Users can insert own likes" ON likes;
-CREATE POLICY "Users can insert own likes" ON likes FOR INSERT WITH CHECK (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can insert own likes" ON public.likes;
+CREATE POLICY "Users can insert own likes" ON public.likes FOR INSERT WITH CHECK (auth.uid() = user_id);
 
-DROP POLICY IF EXISTS "Users can delete own likes" ON likes;
-CREATE POLICY "Users can delete own likes" ON likes FOR DELETE USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can delete own likes" ON public.likes;
+CREATE POLICY "Users can delete own likes" ON public.likes FOR DELETE USING (auth.uid() = user_id);
 
 -- Create RLS policies for comments
-DROP POLICY IF EXISTS "Users can view comments" ON comments;
+DROP POLICY IF EXISTS "Users can view comments" ON public.comments;
 CREATE POLICY "Users can view comments" ON comments FOR SELECT USING (true);
 
-DROP POLICY IF EXISTS "Users can insert own comments" ON comments;
-CREATE POLICY "Users can insert own comments" ON comments FOR INSERT WITH CHECK (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can insert own comments" ON public.comments;
+CREATE POLICY "Users can insert own comments" ON public.comments FOR INSERT WITH CHECK (auth.uid() = user_id);
 
-DROP POLICY IF EXISTS "Users can update own comments" ON comments;
-CREATE POLICY "Users can update own comments" ON comments FOR UPDATE USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can update own comments" ON public.comments;
+CREATE POLICY "Users can update own comments" ON public.comments FOR UPDATE USING (auth.uid() = user_id);
 
-DROP POLICY IF EXISTS "Users can delete own comments" ON comments;
-CREATE POLICY "Users can delete own comments" ON comments FOR DELETE USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can delete own comments" ON public.comments;
+CREATE POLICY "Users can delete own comments" ON public.comments FOR DELETE USING (auth.uid() = user_id);
 
 -- Create RLS policies for shares
-DROP POLICY IF EXISTS "Users can view own shares" ON shares;
-CREATE POLICY "Users can view own shares" ON shares FOR SELECT USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can view own shares" ON public.shares;
+CREATE POLICY "Users can view own shares" ON public.shares FOR SELECT USING (auth.uid() = user_id);
 
-DROP POLICY IF EXISTS "Users can insert own shares" ON shares;
-CREATE POLICY "Users can insert own shares" ON shares FOR INSERT WITH CHECK (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can insert own shares" ON public.shares;
+CREATE POLICY "Users can insert own shares" ON public.shares FOR INSERT WITH CHECK (auth.uid() = user_id);
 
 -- Verify table structures
 SELECT 'likes' as table_name, column_name, data_type, is_nullable 

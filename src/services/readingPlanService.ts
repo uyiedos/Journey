@@ -54,13 +54,44 @@ class ReadingPlanService {
   // Get all public reading plans
   async getPublicReadingPlans(): Promise<ReadingPlan[]> {
     try {
+      console.log('Attempting to fetch reading plans from Supabase...');
+      console.log('Supabase URL:', process.env.NEXT_PUBLIC_SUPABASE_URL);
+      
       const { data, error } = await supabase
         .from('reading_plans')
         .select('*')
         .eq('is_public', true)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      console.log('Supabase response:', { data, error });
+
+      if (error) {
+        console.error('Supabase error fetching reading plans:', error);
+        // Check if it's a "relation does not exist" error
+        if (error.code === 'PGRST116') {
+          console.error('The reading_plans table does not exist in Supabase!');
+        }
+        throw error;
+      }
+      
+      console.log(`Successfully fetched ${data?.length || 0} reading plans from Supabase`);
+      
+      // If no data, let's try without the is_public filter
+      if (!data || data.length === 0) {
+        console.log('No public reading plans found, trying all reading plans...');
+        const { data: allPlans, error: allPlansError } = await supabase
+          .from('reading_plans')
+          .select('*')
+          .order('created_at', { ascending: false });
+          
+        if (allPlansError) {
+          console.error('Error fetching all reading plans:', allPlansError);
+        } else {
+          console.log(`Found ${allPlans?.length || 0} total reading plans (including private)`);
+          return allPlans || [];
+        }
+      }
+      
       return data || [];
     } catch (error) {
       console.error('Error fetching reading plans:', error);

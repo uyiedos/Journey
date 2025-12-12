@@ -1088,12 +1088,96 @@ class SupabaseService {
   }
 
   // Enhanced Community methods
+  async getPendingFriendRequests(userId: string): Promise<any[]> {
+    try {
+      const { data, error } = await supabase
+        .from('friendships')
+        .select(`
+          id,
+          requester_id,
+          created_at,
+          users!friendships_requester_id_fkey (
+            id,
+            username,
+            full_name,
+            avatar_url,
+            points,
+            level
+          )
+        `)
+        .eq('addressee_id', userId)
+        .eq('status', 'pending')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      console.error('Error fetching pending friend requests:', error);
+      return [];
+    }
+  }
+
+  async acceptFriendRequest(friendshipId: string): Promise<boolean> {
+    try {
+      const { error } = await supabase
+        .from('friendships')
+        .update({ 
+          status: 'accepted', 
+          updated_at: new Date().toISOString() 
+        })
+        .eq('id', friendshipId);
+
+      if (error) throw error;
+      return true;
+    } catch (error) {
+      console.error('Error accepting friend request:', error);
+      return false;
+    }
+  }
+
+  async declineFriendRequest(friendshipId: string): Promise<boolean> {
+    try {
+      const { error } = await supabase
+        .from('friendships')
+        .update({ 
+          status: 'declined', 
+          updated_at: new Date().toISOString() 
+        })
+        .eq('id', friendshipId);
+
+      if (error) throw error;
+      return true;
+    } catch (error) {
+      console.error('Error declining friend request:', error);
+      return false;
+    }
+  }
+
   async getFriends(userId: string): Promise<any[]> {
     try {
-      // Get friendships where user is involved
+      // Get friendships where user is involved and status is accepted
       const { data: friendships, error } = await supabase
         .from('friendships')
-        .select('*')
+        .select(`
+          requester_id,
+          addressee_id,
+          requester:users!friendships_requester_id_fkey (
+            id,
+            username,
+            full_name,
+            avatar_url,
+            points,
+            level
+          ),
+          addressee:users!friendships_addressee_id_fkey (
+            id,
+            username,
+            full_name,
+            avatar_url,
+            points,
+            level
+          )
+        `)
         .or(`requester_id.eq.${userId},addressee_id.eq.${userId}`)
         .eq('status', 'accepted');
 
@@ -1107,23 +1191,27 @@ class SupabaseService {
       
       if (!friendships || friendships.length === 0) return [];
 
-      // Get friend user details
-      const friendIds = friendships.map(f => 
-        f.requester_id === userId ? f.addressee_id : f.requester_id
-      );
+      // Extract friend information
+      const friends = friendships.map(friendship => {
+        const isRequester = friendship.requester_id === userId;
+        const friendData = isRequester ? friendship.addressee : friendship.requester;
+        
+        // Handle case where friendData might be an array (Supabase sometimes returns arrays)
+        const friend = Array.isArray(friendData) ? friendData[0] : friendData;
+        
+        return {
+          id: friend.id,
+          username: friend.username,
+          full_name: friend.full_name,
+          avatar_url: friend.avatar_url,
+          points: friend.points,
+          level: friend.level,
+          friendship_status: 'accepted',
+          status: 'online' // Would need real-time status tracking
+        };
+      });
 
-      const { data: friends, error: friendsError } = await supabase
-        .from('users')
-        .select('id, username, full_name, avatar_url, points, level')
-        .in('id', friendIds);
-
-      if (friendsError) throw friendsError;
-      
-      return friends?.map(friend => ({
-        ...friend,
-        friendship_status: 'accepted',
-        status: 'online' // Would need real-time status tracking
-      })) || [];
+      return friends;
     } catch (error) {
       console.error('Error fetching friends:', error);
       // Return sample friends as fallback
@@ -1168,12 +1256,32 @@ class SupabaseService {
 
   async sendFriendRequest(requesterId: string, addresseeId: string): Promise<boolean> {
     try {
+      // Check if request already exists
+      const { data: existing } = await supabase
+        .from('friendships')
+        .select('id, status')
+        .or(`and(requester_id.eq.${requesterId},addressee_id.eq.${addresseeId}),and(requester_id.eq.${addresseeId},addressee_id.eq.${requesterId})`)
+        .maybeSingle();
+
+      if (existing) {
+        if (existing.status === 'pending') {
+          console.log('Friend request already pending');
+          return false;
+        }
+        if (existing.status === 'accepted') {
+          console.log('Already friends');
+          return false;
+        }
+      }
+
+      // Create new friend request
       const { error } = await supabase
         .from('friendships')
         .insert({
           requester_id: requesterId,
           addressee_id: addresseeId,
-          status: 'pending'
+          status: 'pending',
+          created_at: new Date().toISOString()
         });
 
       if (error) throw error;
@@ -1501,7 +1609,8 @@ class SupabaseService {
         .from('community_groups')
         .insert({
           ...groupData,
-          created_by: userId
+          created_by: userId,
+          is_private: false // Always public - anyone can join
         })
         .select()
         .single();

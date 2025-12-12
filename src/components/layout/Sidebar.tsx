@@ -30,7 +30,7 @@ const navigation = [
   { name: 'Bible', href: '/bible', icon: BookOpen },
   { name: 'Devotionals', href: '/devotionals', icon: Heart },
   { name: 'Reading Plans', href: '/plans', icon: Calendar },
-  { name: 'Virgo AI', href: '/ai-tools', icon: Cross },
+  { name: 'Virgo AI', href: '/virgo-ai', icon: Cross },
   { name: 'Community', href: '/community', icon: Users },
   { name: 'Events', href: '/events', icon: Video },
   { name: 'Leaderboard', href: '/leaderboard', icon: Crown },

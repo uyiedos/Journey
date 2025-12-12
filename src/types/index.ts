@@ -214,5 +214,8 @@ export interface Event {
   startsAt: string;
   endsAt?: string;
   createdAt: string;
+  created_by?: string;
   tags?: string[];
+  likes_count?: number;
+  comments_count?: number;
 }
