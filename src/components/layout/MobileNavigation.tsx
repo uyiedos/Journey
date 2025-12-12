@@ -30,7 +30,8 @@ import {
   ChevronRight,
   Crown,
   Gift,
-  Brain
+  Brain,
+  Coins
 } from 'lucide-react';
 
 export function MobileNavigation() {
@@ -105,9 +106,9 @@ export function MobileNavigation() {
       description: 'Your Progress'
     },
     { 
-      name: 'Donations', 
+      name: '$JOURNEY', 
       href: '/donations', 
-      icon: Gift,
+      icon: Coins,
       color: 'text-pink-600 dark:text-pink-400',
       bgColor: 'bg-pink-50 hover:bg-pink-100 border border-pink-200',
       description: 'Support & Tokens'

@@ -20,7 +20,8 @@ import {
   MoreHorizontal,
   Palette,
   MessageSquare,
-  BookOpen
+  BookOpen,
+  Smartphone
 } from 'lucide-react';
 import { bibleAPI, BibleVerse } from '@/lib/bible-api';
 import { bibleService, BibleBookmark, BibleHighlight, BibleNote } from '@/services/bibleService';
@@ -250,6 +251,9 @@ export default function EnhancedBibleReader({ book, chapter, translation, verses
         case 'facebook':
           shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}&quote=${encodeURIComponent(text)}`;
           break;
+        case 'whatsapp':
+          shareUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
+          break;
       }
       
       if (shareUrl) {
@@ -323,9 +327,9 @@ export default function EnhancedBibleReader({ book, chapter, translation, verses
                 <Button 
                   variant="ghost" 
                   size="sm" 
-                  className="opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6 p-0"
+                  className="opacity-100 hover:bg-blue-100 transition-all h-8 w-8 p-0 border border-blue-300 bg-white shadow-sm"
                 >
-                  <MoreHorizontal className="h-3 w-3" />
+                  <Share2 className="h-4 w-4 text-blue-600" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
@@ -359,14 +363,19 @@ export default function EnhancedBibleReader({ book, chapter, translation, verses
                   Copy
                 </DropdownMenuItem>
                 
-                <DropdownMenuItem onClick={() => shareOnSocial('twitter', verse.verse)}>
+                <DropdownMenuItem onClick={() => shareOnSocial('twitter', verse.verse)} className="text-blue-600 hover:text-blue-700 hover:bg-blue-50">
                   <Twitter className="h-4 w-4 mr-2" />
                   Share on Twitter
                 </DropdownMenuItem>
                 
-                <DropdownMenuItem onClick={() => shareOnSocial('facebook', verse.verse)}>
+                <DropdownMenuItem onClick={() => shareOnSocial('facebook', verse.verse)} className="text-blue-600 hover:text-blue-700 hover:bg-blue-50">
                   <Facebook className="h-4 w-4 mr-2" />
                   Share on Facebook
+                </DropdownMenuItem>
+                
+                <DropdownMenuItem onClick={() => shareOnSocial('whatsapp', verse.verse)} className="text-green-600 hover:text-green-700 hover:bg-green-50">
+                  <Smartphone className="h-4 w-4 mr-2" />
+                  Share on WhatsApp
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

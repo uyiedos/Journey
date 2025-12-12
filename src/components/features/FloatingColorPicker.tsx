@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Palette, X, Minimize2, Maximize2 } from 'lucide-react';
+import { Palette, X, Minimize2, Maximize2, Plus, Minus, Type } from 'lucide-react';
 
 interface FloatingColorPickerProps {
   onColorChange?: (color: string) => void;
@@ -16,6 +16,7 @@ export function FloatingColorPicker({ onColorChange }: FloatingColorPickerProps)
   const [isMinimized, setIsMinimized] = useState(false);
   const [backgroundColor, setBackgroundColor] = useState('#ffffff');
   const [customColor, setCustomColor] = useState('#ffffff');
+  const [fontSize, setFontSize] = useState(16); // Default font size in pixels
 
   const presetColors = [
     '#ffffff', // White
@@ -61,11 +62,24 @@ export function FloatingColorPicker({ onColorChange }: FloatingColorPickerProps)
       setCustomColor(savedColor);
       applyBackgroundColor(savedColor);
     }
+    
+    // Load saved font size from localStorage
+    const savedFontSize = localStorage.getItem('font-size');
+    if (savedFontSize) {
+      const size = parseInt(savedFontSize);
+      setFontSize(size);
+      applyFontSize(size);
+    }
   }, []);
 
   const applyBackgroundColor = (color: string) => {
     document.body.style.backgroundColor = color;
     document.body.style.transition = 'background-color 0.3s ease';
+  };
+
+  const applyFontSize = (size: number) => {
+    document.documentElement.style.fontSize = `${size}px`;
+    document.documentElement.style.transition = 'font-size 0.3s ease';
   };
 
   const handleColorChange = (color: string) => {
@@ -84,6 +98,27 @@ export function FloatingColorPicker({ onColorChange }: FloatingColorPickerProps)
 
   const resetToDefault = () => {
     handleColorChange('#ffffff');
+  };
+
+  const increaseFontSize = () => {
+    const newSize = Math.min(fontSize + 2, 32); // Max 32px
+    setFontSize(newSize);
+    applyFontSize(newSize);
+    localStorage.setItem('font-size', newSize.toString());
+  };
+
+  const decreaseFontSize = () => {
+    const newSize = Math.max(fontSize - 2, 12); // Min 12px
+    setFontSize(newSize);
+    applyFontSize(newSize);
+    localStorage.setItem('font-size', newSize.toString());
+  };
+
+  const resetFontSize = () => {
+    const defaultSize = 16;
+    setFontSize(defaultSize);
+    applyFontSize(defaultSize);
+    localStorage.setItem('font-size', defaultSize.toString());
   };
 
   if (!isOpen) {
@@ -188,6 +223,45 @@ export function FloatingColorPicker({ onColorChange }: FloatingColorPickerProps)
                   className="flex-1 font-mono text-sm"
                 />
               </div>
+            </div>
+
+            {/* Font Size Control */}
+            <div>
+              <Label className="text-sm font-medium mb-2 block flex items-center gap-2">
+                <Type className="h-4 w-4" />
+                Font Size
+              </Label>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={decreaseFontSize}
+                  disabled={fontSize <= 12}
+                  className="px-2"
+                >
+                  <Minus className="h-3 w-3" />
+                </Button>
+                <div className="flex-1 text-center">
+                  <span className="text-sm font-medium">{fontSize}px</span>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={increaseFontSize}
+                  disabled={fontSize >= 32}
+                  className="px-2"
+                >
+                  <Plus className="h-3 w-3" />
+                </Button>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={resetFontSize}
+                className="w-full mt-2 text-xs"
+              >
+                Reset Font Size
+              </Button>
             </div>
 
             {/* Reset Button */}
