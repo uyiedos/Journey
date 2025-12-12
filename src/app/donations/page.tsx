@@ -28,6 +28,7 @@ import {
   Share2,
   Trophy,
   Coins,
+  Calendar,
   Sparkles,
   CheckCircle,
   AlertCircle,
@@ -143,7 +144,7 @@ export default function DonationsPage() {
               <Coins className="h-10 w-10 text-white" />
             </div>
             <h1 className="text-4xl font-bold bg-linear-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-              Journey Donations
+              $JOURNEY
             </h1>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               Support our mission and earn $JOURNEY tokens. Every donation helps us grow and rewards you with future tokens.
@@ -176,10 +177,12 @@ export default function DonationsPage() {
             <Rocket className="h-10 w-10 text-white" />
           </div>
           <h1 className="text-4xl font-bold bg-linear-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-            Journey Donations & $JOURNEY Tokens
+            $JOURNEY & $JOURNEY Tokens
           </h1>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Support our spiritual journey platform and earn $JOURNEY tokens. Coming soon!
+            We're working hard to bring you an amazing token system. Support Journey and earn $JOURNEY tokens while helping us grow our spiritual community.
+
+            $JOURNEY will be launched on fair launch via pump.fun and launch event will be viewed live via our video channel. Launch Date will be revealed
           </p>
         </div>
 
@@ -248,51 +251,15 @@ export default function DonationsPage() {
               <p className="text-sm text-muted-foreground mb-4">
                 Be the first to know when donations launch. Early supporters will get special bonuses!
               </p>
-              <Button size="lg" className="bg-purple-600 hover:bg-purple-700">
-                <Mail className="mr-2 h-4 w-4" />
-                Notify Me When Available
+              <Button 
+                size="lg" 
+                className="bg-purple-600 hover:bg-purple-700"
+                onClick={() => window.open('https://calendar.google.com/calendar/render?action=TEMPLATE&text=$JOURNEY+Token+Launch&details=Join+us+for+the+$JOURNEY+token+launch+event+live+on+our+video+channel.+Fair+launch+via+pump.fun', '_blank')}
+              >
+                <Calendar className="mr-2 h-4 w-4" />
+                Notify Me - Save to Calendar
               </Button>
             </div>
-          </CardContent>
-        </Card>
-
-        {/* Token Preview */}
-        <Card className="bg-linear-to-r from-purple-50 to-pink-50 border-purple-200">
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <Sparkles className="h-5 w-5 text-purple-600" />
-              <span>$JOURNEY Token Preview</span>
-            </CardTitle>
-            <CardDescription>
-              Future utility token for the Journey ecosystem
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="text-center p-4 bg-white rounded-lg">
-                <div className="text-2xl font-bold text-purple-600">100M</div>
-                <div className="text-sm text-muted-foreground">Total Supply</div>
-              </div>
-              <div className="text-center p-4 bg-white rounded-lg">
-                <div className="text-2xl font-bold text-pink-600">15M</div>
-                <div className="text-sm text-muted-foreground">Circulating</div>
-              </div>
-              <div className="text-center p-4 bg-white rounded-lg">
-                <div className="text-2xl font-bold text-green-600">0</div>
-                <div className="text-sm text-muted-foreground">Your Tokens</div>
-              </div>
-              <div className="text-center p-4 bg-white rounded-lg">
-                <div className="text-2xl font-bold text-blue-600">$0.50</div>
-                <div className="text-sm text-muted-foreground">Est. Value</div>
-              </div>
-            </div>
-            
-            <Alert className="mt-6">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription>
-                Token launch scheduled for Q2 2024. All eligible users will be notified via email.
-              </AlertDescription>
-            </Alert>
           </CardContent>
         </Card>
       </div>

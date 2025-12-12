@@ -22,7 +22,8 @@ import {
   Shield,
   UserPlus,
   Cross,
-  Video
+  Video,
+  Coins
 } from 'lucide-react';
 
 const navigation = [
@@ -36,7 +37,7 @@ const navigation = [
   { name: 'Leaderboard', href: '/leaderboard', icon: Crown },
   { name: 'Achievements', href: '/achievements', icon: Trophy },
   { name: 'Referrals', href: '/referrals', icon: UserPlus },
-  { name: 'Donations', href: '/donations', icon: Gift },
+  { name: '$JOURNEY', href: '/donations', icon: Coins },
   { name: 'Settings', href: '/settings', icon: Settings },
 ];
 

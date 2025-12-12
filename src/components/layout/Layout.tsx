@@ -9,6 +9,7 @@ import { UserDataProvider } from '@/contexts/UserDataContext';
 import { ReferralProvider } from '@/contexts/ReferralContext';
 import { Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { FloatingColorPicker } from '@/components/features/FloatingColorPicker';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -64,6 +65,9 @@ export function Layout({ children }: LayoutProps) {
             
             {/* Mobile Bottom Navigation */}
             <MobileBottomNav />
+            
+            {/* Floating Color Picker */}
+            <FloatingColorPicker />
           </div>
         </ReferralProvider>
       </UserDataProvider>

@@ -11,7 +11,8 @@ import {
   Calendar, 
   Users, 
   Trophy,
-  Video 
+  Video,
+  Coins 
 } from 'lucide-react'
 
 const mobileNavigation = [
@@ -21,6 +22,7 @@ const mobileNavigation = [
   { name: 'Plans', href: '/plans', icon: Calendar },
   { name: 'Community', href: '/community', icon: Users },
   { name: 'Events', href: '/events', icon: Video },
+  { name: '$JOURNEY', href: '/donations', icon: Coins },
   { name: 'Leaderboard', href: '/leaderboard', icon: Trophy },
 ]
 
@@ -29,7 +31,7 @@ export function MobileBottomNav() {
 
   return (
     <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50">
-      <div className="grid grid-cols-7 gap-1 py-2">
+      <div className="grid grid-cols-8 gap-1 py-2">
         {mobileNavigation.map((item) => {
           const isActive = pathname === item.href
           return (
