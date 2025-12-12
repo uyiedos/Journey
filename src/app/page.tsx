@@ -222,22 +222,52 @@ export default function Home() {
           {dbEvents.length > 0 && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {dbEvents.slice(0, 3).map((event) => (
-                <Card key={event.id} className="hover:shadow-lg transition-shadow">
-                  <CardHeader>
-                    <CardTitle className="flex items-center justify-between gap-2">
-                      <span>{event.title}</span>
-                      <Badge variant="secondary">Latest</Badge>
-                    </CardTitle>
-                    <CardDescription>{event.description}</CardDescription>
-                  </CardHeader>
-                  <CardContent className="flex items-center justify-between">
+                <Card key={event.id} className="hover:shadow-lg transition-shadow overflow-hidden">
+                  {/* Video Preview */}
+                  {event.videoUrl || event.video_url ? (
+                    <div className="relative aspect-video bg-gray-100">
+                      {(() => {
+                        const videoUrl = event.videoUrl || event.video_url;
+                        const youtubeMatch = videoUrl.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/);
+                        if (youtubeMatch) {
+                          const videoId = youtubeMatch[1];
+                          return (
+                            <iframe
+                              className="w-full h-full"
+                              src={`https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&controls=0&modestbranding=1&rel=0`}
+                              title={event.title}
+                              frameBorder="0"
+                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                              allowFullScreen
+                            />
+                          );
+                        }
+                        return (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <Video className="h-12 w-12 text-gray-400" />
+                            <span className="ml-2 text-gray-500">Video Preview</span>
+                          </div>
+                        );
+                      })()}
+                    </div>
+                  ) : (
+                    <div className="aspect-video bg-gray-100 flex items-center justify-center">
+                      <Video className="h-12 w-12 text-gray-400" />
+                    </div>
+                  )}
+                  
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-lg line-clamp-1">{event.title}</CardTitle>
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <Calendar className="h-4 w-4" />
                       <span>{new Date(event.startsAt || event.starts_at).toLocaleDateString()}</span>
                     </div>
-                    <Link href="/events">
-                      <Button size="sm" className="flex items-center gap-1">
-                        Join Event
+                  </CardHeader>
+                  
+                  <CardContent className="pt-0">
+                    <Link href={`/events/${event.id}`}>
+                      <Button size="sm" className="w-full flex items-center justify-center gap-2">
+                        View Event
                         <ArrowRight className="h-4 w-4" />
                       </Button>
                     </Link>
