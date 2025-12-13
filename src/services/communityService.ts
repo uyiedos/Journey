@@ -455,12 +455,11 @@ class CommunityService {
         .from('conversation_participants')
         .select('conversation_id')
         .eq('user_id', userId1)
-        .in('conversation_id', (
-          supabaseClient
+        .in('conversation_id', (await supabaseClient
             .from('conversation_participants')
             .select('conversation_id')
             .eq('user_id', userId2)
-        ));
+          ).data?.map(item => item.conversation_id) || []);
 
       if (existing && existing.length > 0) {
         // Return existing conversation

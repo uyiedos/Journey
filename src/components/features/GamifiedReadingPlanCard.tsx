@@ -57,9 +57,9 @@ export function GamifiedReadingPlanCard({
   className
 }: GamifiedReadingPlanCardProps) {
   const progressPercentage = plan.progress || 0
-  const status = plan.status || 'not_started'
-  const isStarted = status !== 'not_started'
-  const isCompleted = status === 'completed'
+  const isStarted = plan.userPlan?.is_active || false
+  const isCompleted = plan.userPlan?.completed_at ? true : false
+  const status = isCompleted ? 'completed' : (isStarted ? 'in_progress' : 'not_started')
   const currentDay = plan.userPlan?.current_day || 1
 
   const getDifficultyColor = (difficulty: string) => {

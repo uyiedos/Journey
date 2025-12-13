@@ -35,6 +35,8 @@ export interface UserReadingPlan {
   is_active: boolean;
   created_at: string;
   updated_at: string;
+  status?: 'not_started' | 'in_progress' | 'completed';
+  total_days?: number;
 }
 
 export interface ReadingPlanProgress {
@@ -151,34 +153,7 @@ class ReadingPlanService {
     }
   }
 
-  // Start a reading plan for a user
-  async startReadingPlan(userId: string, planId: string): Promise<UserReadingPlan> {
-    try {
-      // Create user reading plan entry
-      const { data: userPlan, error: userPlanError } = await supabase
-        .from('user_reading_plans')
-        .insert([{
-          user_id: userId,
-          plan_id: planId,
-          started_at: new Date().toISOString(),
-          current_day: 1,
-          is_active: true
-        }])
-        .select()
-        .single();
-
-      if (userPlanError) throw userPlanError;
-
-      // Award initial points for starting a plan
-      await this.awardPoints(userId, 10, 'Started a reading plan');
-
-      return userPlan;
-    } catch (error) {
-      console.error('Error starting reading plan:', error);
-      throw error;
-    }
-  }
-
+  
   // Get user's reading plans
   async getUserReadingPlans(userId: string): Promise<UserReadingPlan[]> {
     try {
@@ -217,50 +192,7 @@ class ReadingPlanService {
     }
   }
 
-  // Mark a day as completed
-  async completeDay(
-    userId: string, 
-    planId: string, 
-    day: number, 
-    notes?: string
-  ): Promise<ReadingPlanProgress> {
-    try {
-      const { data, error } = await supabase
-        .from('reading_plan_progress')
-        .upsert([{
-          user_id: userId,
-          plan_id: planId,
-          day: day,
-          completed: true,
-          completed_at: new Date().toISOString(),
-          notes: notes || null,
-          points_earned: 5 // Award 5 points per completed day
-        }])
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      // Award points for completing a day
-      await this.awardPoints(userId, 5, 'Completed a reading plan day');
-
-      // Update user reading plan current day
-      await supabase
-        .from('user_reading_plans')
-        .update({ 
-          current_day: day + 1,
-          updated_at: new Date().toISOString()
-        })
-        .eq('user_id', userId)
-        .eq('plan_id', planId);
-
-      return data;
-    } catch (error) {
-      console.error('Error completing day:', error);
-      throw error;
-    }
-  }
-
+  
   // Complete entire reading plan
   async completeReadingPlan(userId: string, planId: string): Promise<UserReadingPlan> {
     try {
@@ -494,7 +426,7 @@ class ReadingPlanService {
           // Continue streak
           newStreak = currentStreak.current_streak + 1;
           longestStreak = Math.max(currentStreak.longest_streak, newStreak);
-        } else if (lastCompleted === todayStr) {
+        } else if (lastCompleted === new Date().toISOString().split('T')[0]) {
           // Already completed today
           return;
         } else {
@@ -544,7 +476,7 @@ class ReadingPlanService {
       }
 
       const completedDays = progress.filter(p => p.completed).length;
-      const progressPercentage = userPlan.total_days > 0 ? (completedDays / userPlan.total_days) * 100 : 0;
+      const progressPercentage = (userPlan.total_days || 0) > 0 ? (completedDays / (userPlan.total_days || 0)) * 100 : 0;
 
       // Get streak
       const { data: streakData } = await supabase
@@ -555,9 +487,9 @@ class ReadingPlanService {
         .single();
 
       return {
-        status: userPlan.status,
+        status: userPlan.status || 'not_started',
         currentDay: userPlan.current_day,
-        totalDays: userPlan.total_days,
+        totalDays: userPlan.total_days || 0,
         progressPercentage,
         completedDays,
         streak: streakData?.current_streak || 0

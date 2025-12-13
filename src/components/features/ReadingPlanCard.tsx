@@ -28,7 +28,7 @@ export function ReadingPlanCard({ plan, userProgress = 0 }: ReadingPlanCardProps
     
     try {
       setIsStarting(true);
-      await readingPlanService.startReadingPlan(user.id, plan.id);
+      await readingPlanService.startReadingPlan(user.id, plan.id, plan.duration || 30);
       setHasStarted(true);
       // Optionally redirect to the plans page
       window.location.href = `/plans`;
