@@ -33,10 +33,10 @@ export function Header() {
               Journey
             </span>
           </Link>
-          <Link href="/events" className="hidden md:block">
+          <Link href="/journey-tv" className="hidden md:block">
             <Button variant="ghost" size="sm" className="ml-2 flex items-center gap-1">
               <Sparkles className="h-4 w-4 text-purple-500" />
-              <span>Events</span>
+              <span>Journey TV</span>
             </Button>
           </Link>
         </div>

@@ -21,7 +21,7 @@ const mobileNavigation = [
   { name: 'Devotionals', href: '/devotionals', icon: Heart },
   { name: 'Plans', href: '/plans', icon: Calendar },
   { name: 'Community', href: '/community', icon: Users },
-  { name: 'Events', href: '/events', icon: Video },
+  { name: 'Journey TV', href: '/journey-tv', icon: Video },
   { name: '$JOURNEY', href: '/donations', icon: Coins },
   { name: 'Leaderboard', href: '/leaderboard', icon: Trophy },
 ]

@@ -413,6 +413,92 @@ class CommunityService {
     }
   }
 
+  async getConversations(userId: string): Promise<Conversation[]> {
+    try {
+      const { data, error } = await supabaseClient
+        .from('conversations')
+        .select(`
+          *,
+          conversation_participants!inner(
+            user_id,
+            joined_at,
+            last_read_at,
+            users!inner(
+              id,
+              username,
+              full_name,
+              avatar_url
+            )
+          ),
+          last_message: messages(
+            id,
+            content,
+            created_at,
+            sender_id
+          )
+        `)
+        .eq('conversation_participants.user_id', userId)
+        .order('updated_at', { ascending: false });
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      console.error('Error getting conversations:', error);
+      return [];
+    }
+  }
+
+  async createDirectMessage(userId1: string, userId2: string): Promise<Conversation> {
+    try {
+      // Check if conversation already exists
+      const { data: existing } = await supabaseClient
+        .from('conversation_participants')
+        .select('conversation_id')
+        .eq('user_id', userId1)
+        .in('conversation_id', (
+          supabaseClient
+            .from('conversation_participants')
+            .select('conversation_id')
+            .eq('user_id', userId2)
+        ));
+
+      if (existing && existing.length > 0) {
+        // Return existing conversation
+        const { data: conversation } = await supabaseClient
+          .from('conversations')
+          .select('*')
+          .eq('id', existing[0].conversation_id)
+          .single();
+        return conversation;
+      }
+
+      // Create new conversation
+      const { data, error } = await supabaseClient
+        .from('conversations')
+        .insert([{
+          type: 'direct',
+          created_by: userId1
+        }])
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      // Add participants
+      await supabaseClient
+        .from('conversation_participants')
+        .insert([
+          { conversation_id: data.id, user_id: userId1, role: 'member' },
+          { conversation_id: data.id, user_id: userId2, role: 'member' }
+        ]);
+
+      return data;
+    } catch (error) {
+      console.error('Error creating direct message:', error);
+      throw error;
+    }
+  }
+
   async sendMessage(conversationId: string, senderId: string, content: string, type: Message['message_type'] = 'text'): Promise<Message | null> {
     try {
       const { data, error } = await supabaseClient
@@ -463,7 +549,37 @@ class CommunityService {
     }
   }
 
-  async getCommunityPosts(limit: number = 20, offset: number = 0): Promise<any[]> {
+  async createCommunityPost(postData: {
+    author_id: string;
+    content: string;
+    post_type: 'general' | 'prayer_request' | 'testimony' | 'verse_share' | 'question';
+    is_public: boolean;
+    attachments?: any[];
+    tags?: string[];
+  }): Promise<any> {
+    try {
+      const { data, error } = await supabaseClient
+        .from('community_posts')
+        .insert([{
+          ...postData,
+          likes_count: 0,
+          comments_count: 0,
+          shares_count: 0,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        }])
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error('Error creating post:', error);
+      throw error;
+    }
+  }
+
+  async getCommunityPosts(userId?: string, limit: number = 20, offset: number = 0): Promise<any[]> {
     try {
       // Get public posts first
       const { data: posts, error: postError } = await supabaseClient
@@ -509,8 +625,15 @@ class CommunityService {
     }
   }
 
-  async reactToPost(postId: string, userId: string, reactionType: PostReaction['reaction_type']): Promise<PostReaction | null> {
+  async reactToPost(postId: string, reactionType: PostReaction['reaction_type'], userId?: string): Promise<PostReaction | null> {
     try {
+      if (!userId) {
+        // Get current user if userId not provided
+        const { data: { user } } = await supabaseClient.auth.getUser();
+        userId = user?.id;
+        if (!userId) throw new Error('User not authenticated');
+      }
+
       // First remove any existing reaction
       await supabaseClient
         .from('post_reactions')

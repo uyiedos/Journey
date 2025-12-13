@@ -33,7 +33,7 @@ const navigation = [
   { name: 'Reading Plans', href: '/plans', icon: Calendar },
   { name: 'Virgo AI', href: '/virgo-ai', icon: Cross },
   { name: 'Community', href: '/community', icon: Users },
-  { name: 'Events', href: '/events', icon: Video },
+  { name: 'Journey TV', href: '/journey-tv', icon: Video },
   { name: 'Leaderboard', href: '/leaderboard', icon: Crown },
   { name: 'Achievements', href: '/achievements', icon: Trophy },
   { name: 'Referrals', href: '/referrals', icon: UserPlus },
