@@ -72,12 +72,12 @@ export function ChatComponent() {
 
     try {
       setSendingMessage(true);
-      const message = await communityService.sendMessage({
-        conversation_id: selectedConversation.id,
-        sender_id: user.id,
-        content: newMessage,
-        message_type: 'text'
-      });
+      const message = await communityService.sendMessage(
+        selectedConversation.id,
+        user.id,
+        newMessage,
+        'text'
+      );
       
       setMessages([...messages, message]);
       setNewMessage('');
