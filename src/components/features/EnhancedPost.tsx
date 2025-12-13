@@ -51,7 +51,7 @@ export function EnhancedPost({
     if (!authUser) return;
     
     try {
-      await communityService.reactToPost(post.id, authUser.id, type);
+      await communityService.reactToPost(post.id, type, authUser.id);
       setUserReaction(type);
       if (onPostUpdate) onPostUpdate();
     } catch (error) {
