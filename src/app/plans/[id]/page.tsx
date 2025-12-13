@@ -91,7 +91,7 @@ export default function PlanDetailPage() {
   }
 
   const completeCurrentDay = async () => {
-    if (!user || !userPlan) return
+    if (!user || !userPlan || !plan) return
     
     try {
       await readingPlanService.completeDay(user.id, plan.id, userPlan.current_day)
