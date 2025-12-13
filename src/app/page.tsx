@@ -17,7 +17,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { DevotionalService, Devotional } from '@/services/devotionalService';
 import { getTodaysDevotional, getAllDevotionals } from '@/data/devotionals';
-import { getLatestEvents } from '@/data/events';
+import { getLatestChannels } from '@/data/channels';
 import { readingPlanService, type ReadingPlan, type UserReadingPlan } from '@/services/readingPlanService';
 import { BookOpen, Users, Heart, Trophy, Star, ArrowRight, Award, Sparkles, Calendar, Video } from 'lucide-react';
 
@@ -30,7 +30,7 @@ export default function Home() {
   const [dbReadingPlans, setDbReadingPlans] = useState<ReadingPlan[]>([]);
   const [userReadingPlans, setUserReadingPlans] = useState<UserReadingPlan[]>([]);
   const [dbDevotionals, setDbDevotionals] = useState<Devotional[]>([]);
-  const [dbEvents, setDbEvents] = useState<any[]>([]);
+  const [dbChannels, setDbChannels] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   
   useEffect(() => {
@@ -64,10 +64,10 @@ export default function Home() {
         const devotionals = await DevotionalService.getAllDevotionals();
         setDbDevotionals(devotionals);
         
-        // Fetch events from Supabase
-        const { EventService } = await import('@/services/eventService');
-        const events = await EventService.getAllEvents();
-        setDbEvents(events);
+        // Fetch channels from Supabase
+        const { ChannelService } = await import('@/services/channelService');
+        const channels = await ChannelService.getAllChannels();
+        setDbChannels(channels);
         
         // Fetch user reading plans if logged in
         if (user) {
@@ -215,24 +215,24 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Latest Events */}
+        {/* Latest Journey TV Channels */}
         <section className="space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold">Latest Events</h2>
-            <Link href="/events">
-              <Button variant="outline">View All Events</Button>
+            <h2 className="text-2xl font-bold">Latest Journey TV Channels</h2>
+            <Link href="/journey-tv">
+              <Button variant="outline">View All Channels</Button>
             </Link>
           </div>
           
-          {dbEvents.length > 0 && (
+          {dbChannels.length > 0 && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {dbEvents.slice(0, 3).map((event) => (
-                <Card key={event.id} className="hover:shadow-lg transition-shadow overflow-hidden">
+              {dbChannels.slice(0, 3).map((channel) => (
+                <Card key={channel.id} className="hover:shadow-lg transition-shadow overflow-hidden">
                   {/* Video Preview */}
-                  {event.videoUrl || event.video_url ? (
+                  {channel.videoUrl || channel.video_url ? (
                     <div className="relative aspect-video bg-gray-100">
                       {(() => {
-                        const videoUrl = event.videoUrl || event.video_url;
+                        const videoUrl = channel.videoUrl || channel.video_url;
                         const youtubeMatch = videoUrl.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/);
                         if (youtubeMatch) {
                           const videoId = youtubeMatch[1];
@@ -240,7 +240,7 @@ export default function Home() {
                             <iframe
                               className="w-full h-full"
                               src={`https://www.youtube.com/embed/${videoId}?autoplay=0&mute=1&loop=1&playlist=${videoId}&controls=0&modestbranding=1&rel=0`}
-                              title={event.title}
+                              title={channel.title}
                               frameBorder="0"
                               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                               allowFullScreen
@@ -262,17 +262,23 @@ export default function Home() {
                   )}
                   
                   <CardHeader className="pb-3">
-                    <CardTitle className="text-lg line-clamp-1">{event.title}</CardTitle>
+                    <div className="flex items-center gap-2 mb-2">
+                      <Badge variant={channel.status === 'live' ? 'destructive' : 'secondary'}>
+                        {channel.status || 'offline'}
+                      </Badge>
+                      <Badge variant="outline">{channel.category || 'general'}</Badge>
+                    </div>
+                    <CardTitle className="text-lg line-clamp-1">{channel.title}</CardTitle>
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Calendar className="h-4 w-4" />
-                      <span>{new Date(event.startsAt || event.starts_at).toLocaleDateString()}</span>
+                      <Video className="h-4 w-4" />
+                      <span>{channel.description || 'Journey TV Channel'}</span>
                     </div>
                   </CardHeader>
                   
                   <CardContent className="pt-0">
-                    <Link href={`/events/${event.id}`}>
+                    <Link href={`/journey-tv/${channel.id}`}>
                       <Button size="sm" className="w-full flex items-center justify-center gap-2">
-                        View Event
+                        Watch Channel
                         <ArrowRight className="h-4 w-4" />
                       </Button>
                     </Link>

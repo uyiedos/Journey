@@ -61,6 +61,16 @@ export function FriendsSidebar() {
     }
   };
 
+  const startConversation = async (friendId: string) => {
+    try {
+      const conversation = await communityService.createDirectMessage(user?.id || '', friendId);
+      // Navigate to conversation or open chat modal
+      console.log('Conversation created:', conversation);
+    } catch (error) {
+      console.error('Error starting conversation:', error);
+    }
+  };
+
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'online':
@@ -215,7 +225,7 @@ export function FriendsSidebar() {
                       </div>
                     </div>
                   </div>
-                  <Button variant="ghost" size="sm" className="p-1">
+                  <Button variant="ghost" size="sm" className="p-1" onClick={() => startConversation(friend.id)}>
                     <MessageCircle className="h-4 w-4" />
                   </Button>
                 </div>

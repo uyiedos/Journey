@@ -71,7 +71,7 @@ export function SocialFeed({ userId }: SocialFeedProps) {
 
   const likePost = async (postId: string) => {
     try {
-      await communityService.reactToPost(postId, 'like');
+      await communityService.reactToPost(postId, 'like', user?.id || '');
       // Update local state
       setPosts(posts.map(post => 
         post.id === postId 

@@ -39,11 +39,16 @@ export default function CommunityPage() {
   });
   const [loading, setLoading] = useState(true);
 
-  // Fetch community statistics
+  // Fetch community statistics and user data
   useEffect(() => {
     const fetchCommunityStats = async () => {
       try {
-        // Get total members count
+        if (!user) {
+          setLoading(false);
+          return;
+        }
+
+        // Get total members count (from auth.users)
         const { count: totalMembers } = await supabase
           .from('profiles')
           .select('*', { count: 'exact', head: true });
@@ -69,12 +74,28 @@ export default function CommunityPage() {
         
         const pointsTipped = pointsData?.reduce((sum, transaction) => sum + transaction.amount, 0) || 0;
 
+        // Get user's actual points from profiles table
+        const { data: userProfile } = await supabase
+          .from('profiles')
+          .select('points, level')
+          .eq('user_id', user.id)
+          .single();
+
         setCommunityStats({
           totalMembers: totalMembers || 0,
           dailyPosts: dailyPosts || 0,
           prayersSupported: prayersSupported || 0,
           pointsTipped: pointsTipped
         });
+
+        // Update user metadata with actual profile data
+        if (userProfile) {
+          user.user_metadata = {
+            ...user.user_metadata,
+            points: userProfile.points,
+            level: userProfile.level
+          };
+        }
       } catch (error) {
         console.error('Error fetching community stats:', error);
       } finally {
@@ -83,7 +104,7 @@ export default function CommunityPage() {
     };
 
     fetchCommunityStats();
-  }, []);
+  }, [user]);
 
   return (
     <Layout>
